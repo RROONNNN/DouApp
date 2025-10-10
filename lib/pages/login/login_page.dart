@@ -38,35 +38,39 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return BlocProvider<LoginBloc>(
       create: (_) => _bloc,
-      child: BlocConsumer<LoginBloc, LoginState>(
-        listener: (_, state) {
-          switch (state.requestStatus) {
-            case RequestStatus.initial:
-              break;
-            case RequestStatus.requesting:
-              IgnoreLoadingIndicator().show(context);
-              break;
-            case RequestStatus.success:
-              IgnoreLoadingIndicator().hide(context);
-              AppNavigator.pushNamedAndRemoveUntil(
-                  RouterName.home, (_) => false);
-              break;
-            case RequestStatus.failed:
-              IgnoreLoadingIndicator().hide(context);
-              if (state.message?.isNotEmpty ?? false) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.message ?? 'Login failed'),
-                    backgroundColor: Colors.red,
-                  ),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: BlocConsumer<LoginBloc, LoginState>(
+          listener: (context, state) {
+            switch (state.requestStatus) {
+              case RequestStatus.initial:
+                break;
+              case RequestStatus.requesting:
+                IgnoreLoadingIndicator().show(context);
+                break;
+              case RequestStatus.success:
+                IgnoreLoadingIndicator().hide(context);
+                AppNavigator.pushNamedAndRemoveUntil(
+                  RouterName.navigation,
+                  (_) => false,
                 );
-              }
-              break;
-          }
-        },
-        builder: (_, state) => Scaffold(
-          backgroundColor: Colors.white,
-          body: Center(
+                break;
+              case RequestStatus.failed:
+                IgnoreLoadingIndicator().hide(context);
+                if (state.message?.isNotEmpty ?? false) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.message ?? 'Login failed'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+                break;
+            }
+          },
+          builder: (context, state) => Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
               child: Form(
@@ -95,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                       controller: _usernameController,
                       validator: Validator.nullOrEmptyValidation,
                       hintText: 'Username or Email',
-                      onChanged: (value) => _bloc.onChangeUsername(value),
+                      onChanged: (value) => _bloc.onChangeEmail(value),
                     ),
                     const SizedBox(height: 16),
                     // Password TextField
@@ -117,10 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       child: const Text(
                         'Login',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
+                        style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                     ),
                     const SizedBox(height: 16),

@@ -31,4 +31,9 @@ class AppColors {
   static const dividerColor = Color.fromRGBO(209, 209, 209, 1);
 
   static const primaryColorGreen = Color.fromRGBO(119, 200, 0, 1);
+
+  // Navigation colors
+  static const border = Color.fromRGBO(205, 205, 209, 1);
+  static const background = Color.fromRGBO(255, 255, 255, 1);
+  static const onSelection = Color.fromRGBO(84, 220, 215, 0.3);
 }

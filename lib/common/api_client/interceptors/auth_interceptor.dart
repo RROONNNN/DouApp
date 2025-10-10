@@ -14,7 +14,7 @@ import '../../event/event_bus_event.dart';
 import '../../event/event_bus_mixin.dart';
 
 class AuthInterceptor extends Interceptor with EventBusMixin {
-  final SharedPrefs _sharedPrefs = getIt<SharedPrefs>();
+  SharedPrefs get _sharedPrefs => getIt<SharedPrefs>();
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
@@ -33,13 +33,18 @@ class AuthInterceptor extends Interceptor with EventBusMixin {
         if (refreshToken != null) {
           final ApiClient apiClient = getIt<ApiClient>();
           final response = await apiClient.post(
-              path: ApiEndpoint.refresh, data: {'refresh_token': refreshToken});
+            path: ApiEndpoint.refresh,
+            data: {'refresh_token': refreshToken},
+          );
           if (response.isSuccess()) {
-            LoginResponse loginResponse =
-                LoginResponse.fromJson(response.value);
+            LoginResponse loginResponse = LoginResponse.fromJson(
+              response.value,
+            );
             _sharedPrefs.put(SharedPrefsKey.token, loginResponse.accessToken);
             _sharedPrefs.put(
-                SharedPrefsKey.refreshToken, loginResponse.refreshToken);
+              SharedPrefsKey.refreshToken,
+              loginResponse.refreshToken,
+            );
             err.requestOptions.headers['Authorization'] =
                 'Bearer ${loginResponse.accessToken}';
             return super.onError(err, handler);
@@ -48,9 +53,6 @@ class AuthInterceptor extends Interceptor with EventBusMixin {
         }
       } catch (e) {
         log('AuthInterceptor error: ${e.toString()}');
-      } finally {
-        shareEvent(LogoutEvent());
-        AppNavigator.pushNamedAndRemoveUntil(RouterName.login, (r) => false);
       }
     }
     super.onError(err, handler);

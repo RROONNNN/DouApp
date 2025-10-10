@@ -34,38 +34,12 @@ class _BootstrapPageState extends State<BootstrapPage> {
       body: Container(
         color: AppColors.white,
         child: Center(
-          child: BlocProvider<BootstrapCubit>(
-            create: (_) => _bloc,
-            child: BlocConsumer<BootstrapCubit, BootstrapState>(
-              listener: _handleStateListener,
-              builder: (BuildContext context, BootstrapState state) {
-                return Padding(
-                    padding: const EdgeInsets.all(96.0),
-                    child: Center(
-                      child: Image.asset(AssetImages.logo),
-                    ));
-              },
-            ),
+          child: Padding(
+            padding: const EdgeInsets.all(96.0),
+            child: Center(child: Image.asset(AssetImages.logo)),
           ),
         ),
       ),
     );
-  }
-
-  void _handleStateListener(BuildContext context, BootstrapState state) {
-    switch (state.status) {
-      case BootstrapStatus.authenticated:
-        Future.delayed(const Duration(seconds: 4)).then((value) {
-          AppNavigator.pushNamedAndRemoveUntil(RouterName.home, (_) => false);
-        });
-        break;
-      case BootstrapStatus.unauthenticated:
-        Future.delayed(const Duration(seconds: 4)).then((value) {
-          AppNavigator.pushNamedAndRemoveUntil(RouterName.login, (_) => false);
-        });
-        break;
-      case BootstrapStatus.initial:
-        break;
-    }
   }
 }

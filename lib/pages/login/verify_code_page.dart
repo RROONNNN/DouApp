@@ -11,10 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class VerifyCodePage extends StatefulWidget {
-  const VerifyCodePage({
-    super.key,
-    required this.email,
-  });
+  const VerifyCodePage({super.key, required this.email});
 
   final String email;
 
@@ -55,7 +52,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
               IgnoreLoadingIndicator().hide(context);
               // Navigate to home page after successful verification
               AppNavigator.pushNamedAndRemoveUntil(
-                RouterName.home,
+                RouterName.navigation,
                 (_) => false,
               );
               break;
@@ -123,10 +120,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                       const SizedBox(height: 16),
                       Text(
                         'We have sent a verification code to',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),

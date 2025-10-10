@@ -5,7 +5,7 @@ import 'package:injectable/injectable.dart';
 abstract class LocalService {
   String getToken();
   void saveToken(String token);
-  String getRefreshToken();
+  String? getRefreshToken();
   void saveRefreshToken(String refreshToken);
 }
 
@@ -25,7 +25,7 @@ class LocalServiceImplement extends LocalService {
   }
 
   @override
-  String getRefreshToken() {
+  String? getRefreshToken() {
     return _sharedPrefs.get(SharedPrefsKey.refreshToken);
   }
 

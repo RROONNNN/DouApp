@@ -1,5 +1,5 @@
 class ApiEndpoint {
-  static const String baseUrl = 'http://localhost:3000/';
+  static const String baseUrl = 'http://192.168.137.1:3000/';
   static const String login = '/api/auth/login';
   static const String register = '/api/auth/register';
   static const String verifyEmail = '/api/auth/verify-email';

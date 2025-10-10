@@ -16,7 +16,7 @@ class RegisterRequest {
       'password': password,
       'email': email,
       'fullName': fullName,
-      'avatarImage': avatarImage,
+      if (avatarImage != null) 'avatarImage': avatarImage,
     };
   }
 }

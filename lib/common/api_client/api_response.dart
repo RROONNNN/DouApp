@@ -1,16 +1,11 @@
 class ApiResponse {
-  ApiResponse({
-    this.success,
-    this.data,
-    this.error,
-    this.value,
-  });
+  ApiResponse({this.success, this.data, this.error, this.value});
 
   ApiResponse.fromJson(Map<String?, dynamic> json) {
     data = json;
     success =
         json['success'] ?? json['error'] == null && json['error_code'] == null;
-    value = json['value'];
+    value = json['value'] ?? json['message'];
   }
 
   bool? success;

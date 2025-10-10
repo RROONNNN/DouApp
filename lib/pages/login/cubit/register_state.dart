@@ -26,12 +26,17 @@ class RegisterState extends Equatable {
       email: email ?? this.email,
       password: password ?? this.password,
       fullName: fullName ?? this.fullName,
-      requestStatus: requestStatus ?? this.requestStatus,
-      message: message ?? this.message,
+      requestStatus: requestStatus ?? RequestStatus.initial,
+      message: message,
     );
   }
 
   @override
-  List<Object?> get props =>
-      [email, password, fullName, requestStatus, message];
+  List<Object?> get props => [
+    email,
+    password,
+    fullName,
+    requestStatus,
+    message,
+  ];
 }
