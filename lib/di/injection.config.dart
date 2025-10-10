@@ -39,7 +39,6 @@ extension GetItInjectableX on _i174.GetIt {
       () => injectableModule.prefs,
       preResolve: true,
     );
-    gh.factory<_i900.ProfileCubit>(() => _i900.ProfileCubit());
     gh.singleton<_i230.AppBloc>(() => _i230.AppBloc());
     gh.lazySingleton<_i361.Dio>(() => injectableModule.dio);
     await gh.factoryAsync<_i557.PersistCookieJar>(
@@ -78,6 +77,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factoryParam<_i131.VerifyCodeCubit, String, dynamic>(
       (email, _) =>
           _i131.VerifyCodeCubit(email, gh<_i432.AuthenticationService>()),
+    );
+    gh.factory<_i900.ProfileCubit>(
+      () => _i900.ProfileCubit(gh<_i432.AuthenticationService>()),
     );
     return this;
   }

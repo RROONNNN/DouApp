@@ -16,6 +16,7 @@ abstract class AuthenticationService {
   Future<DataState<LoginResponse>> refreshToken(String refreshToken);
   Future<DataState<String>> register(RegisterRequest data);
   Future<DataState<LoginResponse>> verifyEmail(String email, String code);
+  Future<DataState<bool>> logout();
 }
 
 @LazySingleton(as: AuthenticationService)
@@ -23,6 +24,22 @@ class AuthenticationServiceImplement extends AuthenticationService {
   AuthenticationServiceImplement(this._apiClient);
 
   final ApiClient _apiClient;
+  @override
+  Future<DataState<bool>> logout() async {
+    try {
+      final ApiResponse response = await _apiClient.post(
+        path: ApiEndpoint.logout,
+      );
+      if (response.isSuccess()) {
+        return const DataSuccess<bool>(true);
+      }
+      return DataFailed<bool>(response.error);
+    } on DioException catch (e) {
+      return DataFailed<bool>(e.message);
+    } on Exception catch (e) {
+      return DataFailed<bool>(e.toString());
+    }
+  }
 
   @override
   Future<DataState<bool>> login(LoginRequest data) async {
