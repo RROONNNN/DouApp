@@ -20,6 +20,8 @@ import 'package:duo_app/di/modules.dart' as _i920;
 import 'package:duo_app/pages/bloc/app_bloc.dart' as _i230;
 import 'package:duo_app/pages/bootstrap/bootstrap_cubit.dart' as _i427;
 import 'package:duo_app/pages/login/bloc/login_bloc.dart' as _i537;
+import 'package:duo_app/pages/login/cubit/change_password_cubit.dart' as _i351;
+import 'package:duo_app/pages/login/cubit/forgot_password_cubit.dart' as _i940;
 import 'package:duo_app/pages/login/cubit/register_cubit.dart' as _i1065;
 import 'package:duo_app/pages/login/cubit/verify_code_cubit.dart' as _i131;
 import 'package:duo_app/pages/profile/cubit/profile_cubit.dart' as _i900;
@@ -62,6 +64,10 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i432.AuthenticationService>(
       () => _i432.AuthenticationServiceImplement(gh<_i377.ApiClient>()),
     );
+    gh.factoryParam<_i351.ChangePasswordCubit, String?, dynamic>(
+      (email, _) =>
+          _i351.ChangePasswordCubit(gh<_i432.AuthenticationService>(), email),
+    );
     gh.factory<_i1065.RegisterCubit>(
       () => _i1065.RegisterCubit(gh<_i432.AuthenticationService>()),
     );
@@ -77,6 +83,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factoryParam<_i131.VerifyCodeCubit, String, dynamic>(
       (email, _) =>
           _i131.VerifyCodeCubit(email, gh<_i432.AuthenticationService>()),
+    );
+    gh.factory<_i940.ForgotPasswordCubit>(
+      () => _i940.ForgotPasswordCubit(gh<_i432.AuthenticationService>()),
     );
     gh.factory<_i900.ProfileCubit>(
       () => _i900.ProfileCubit(gh<_i432.AuthenticationService>()),

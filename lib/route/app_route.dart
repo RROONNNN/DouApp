@@ -1,5 +1,7 @@
 import 'package:duo_app/pages/bootstrap/bootstrap_page.dart';
 import 'package:duo_app/pages/home/home_page.dart';
+import 'package:duo_app/pages/login/change_password_page.dart';
+import 'package:duo_app/pages/login/forgot_pass_send_email_page.dart';
 import 'package:duo_app/pages/login/login_page.dart';
 import 'package:duo_app/pages/login/register_page.dart';
 import 'package:duo_app/pages/login/verify_code_page.dart';
@@ -15,6 +17,8 @@ class RouterName {
   static const String register = '/register';
   static const String verifyCode = '/verify-code';
   static const String navigation = '/navigation';
+  static const String forgotPassword = '/forgot-password';
+  static const String changePassword = '/change-password';
 }
 
 class AppRoutes {
@@ -36,6 +40,11 @@ class AppRoutes {
         return _materialRoute(settings, VerifyCodePage(email: email ?? ''));
       case RouterName.navigation:
         return _materialRoute(settings, const NavigationPage());
+      case RouterName.forgotPassword:
+        return _materialRoute(settings, const ForgotPasswordPage());
+      case RouterName.changePassword:
+        final email = settings.arguments as String?;
+        return _materialRoute(settings, ChangePasswordPage(email: email ?? ''));
     }
     return null;
   }

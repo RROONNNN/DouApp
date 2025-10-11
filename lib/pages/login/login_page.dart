@@ -108,7 +108,23 @@ class _LoginPageState extends State<LoginPage> {
                       validatePass: true,
                       onChanged: (value) => _bloc.onChangePass(value),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 8),
+                    // Forgot Password Link
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () =>
+                            AppNavigator.pushNamed(RouterName.forgotPassword),
+                        child: Text(
+                          'Forgot Password?',
+                          style: TextStyle(
+                            color: Colors.blue[700],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                     // Login Button
                     ElevatedButton(
                       onPressed: () => onSubmit(),

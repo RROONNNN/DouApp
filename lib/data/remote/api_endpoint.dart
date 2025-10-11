@@ -6,6 +6,7 @@ class ApiEndpoint {
   static const String resendCode = '/api/auth/resend-verification-code';
   static const String forgotPassword = '/api/auth/forgot-password';
   static const String resetPassword = '/api/auth/resend-password-code';
+  static const String changePassword = '/api/auth/change-password';
   static const String refresh = '/api/auth/refresh';
   static const String logout = '/api/auth/logout';
 }
