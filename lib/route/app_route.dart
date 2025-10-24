@@ -1,4 +1,5 @@
 import 'package:duo_app/pages/bootstrap/bootstrap_page.dart';
+import 'package:duo_app/pages/home/elements/theory_page.dart';
 import 'package:duo_app/pages/home/home_page.dart';
 import 'package:duo_app/pages/login/change_password_page.dart';
 import 'package:duo_app/pages/login/forgot_pass_send_email_page.dart';
@@ -19,6 +20,7 @@ class RouterName {
   static const String navigation = '/navigation';
   static const String forgotPassword = '/forgot-password';
   static const String changePassword = '/change-password';
+  static const String theory = '/theory';
 }
 
 class AppRoutes {
@@ -45,6 +47,14 @@ class AppRoutes {
       case RouterName.changePassword:
         final email = settings.arguments as String?;
         return _materialRoute(settings, ChangePasswordPage(email: email ?? ''));
+      case RouterName.theory:
+        final arguments = settings.arguments as Map<String, dynamic>;
+        final title = arguments['title'] as String;
+        final unitNumber = arguments['unitNumber'] as String;
+        return _materialRoute(
+          settings,
+          TheoryPage(title: title, unitNumber: unitNumber),
+        );
     }
     return null;
   }

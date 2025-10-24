@@ -16,9 +16,11 @@ import 'package:duo_app/configs/build_config.dart' as _i718;
 import 'package:duo_app/data/local/local_service.dart' as _i373;
 import 'package:duo_app/data/local/shared_prefs.dart' as _i368;
 import 'package:duo_app/data/remote/authentication_service.dart' as _i432;
+import 'package:duo_app/data/remote/learning_service.dart' as _i359;
 import 'package:duo_app/di/modules.dart' as _i920;
 import 'package:duo_app/pages/bloc/app_bloc.dart' as _i230;
 import 'package:duo_app/pages/bootstrap/bootstrap_cubit.dart' as _i427;
+import 'package:duo_app/pages/home/cubit/home_cubit.dart' as _i655;
 import 'package:duo_app/pages/login/bloc/login_bloc.dart' as _i537;
 import 'package:duo_app/pages/login/cubit/change_password_cubit.dart' as _i351;
 import 'package:duo_app/pages/login/cubit/forgot_password_cubit.dart' as _i940;
@@ -61,6 +63,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i373.LocalService>(
       () => _i373.LocalServiceImplement(gh<_i368.SharedPrefs>()),
     );
+    gh.lazySingleton<_i359.LearningService>(
+      () => _i359.LearningService(gh<_i377.ApiClient>()),
+    );
     gh.lazySingleton<_i432.AuthenticationService>(
       () => _i432.AuthenticationServiceImplement(gh<_i377.ApiClient>()),
     );
@@ -79,6 +84,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i427.BootstrapCubit>(
       () => _i427.BootstrapCubit(gh<_i373.LocalService>()),
+    );
+    gh.factory<_i655.HomeCubit>(
+      () => _i655.HomeCubit(learningService: gh<_i359.LearningService>()),
     );
     gh.factoryParam<_i131.VerifyCodeCubit, String, dynamic>(
       (email, _) =>

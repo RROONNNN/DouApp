@@ -9,4 +9,7 @@ class ApiEndpoint {
   static const String changePassword = '/api/auth/change-password';
   static const String refresh = '/api/auth/refresh';
   static const String logout = '/api/auth/logout';
+  static const String getCourses = '/api/courses/user';
+  static const String getUnitsByCourseId = '/api/units/user';
+  static const String getTheoriesByUnitId = '/api/theories/user';
 }

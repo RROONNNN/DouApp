@@ -47,12 +47,13 @@ class $AssetsNavigationIconsGen {
 class Assets {
   const Assets._();
 
+  static const AssetGenImage level = AssetGenImage('assets/level.png');
   static const AssetGenImage logo = AssetGenImage('assets/logo.png');
   static const $AssetsNavigationIconsGen navigationIcons =
       $AssetsNavigationIconsGen();
 
   /// List of all assets
-  static List<AssetGenImage> get values => [logo];
+  static List<AssetGenImage> get values => [level, logo];
 }
 
 class AssetGenImage {

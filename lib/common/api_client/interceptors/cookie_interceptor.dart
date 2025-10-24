@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
@@ -14,6 +15,7 @@ class CookieInterceptor extends Interceptor {
         .loadForRequest(options.uri)
         .then((cookies) {
           var cookie = getCookies(cookies);
+          log('Cookie: $cookie');
           if (cookie.isNotEmpty) {
             options.headers["Cookie"] = cookie;
           }
@@ -68,7 +70,7 @@ class CookieInterceptor extends Interceptor {
 
   static String getCookies(List<Cookie> cookies) {
     if (cookies.isNotEmpty) {
-      return cookies.first.toString();
+      return cookies.map((c) => '${c.name}=${c.value}').join('; ');
     }
     return '';
   }
