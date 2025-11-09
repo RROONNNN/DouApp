@@ -5,14 +5,14 @@ class Theory {
   final String? example;
   final String? audio;
   final String? translation;
-  final String? pharseText;
+  final String? phraseText;
   final String? term;
   final String? image;
   final String? ipa;
   final String? partOfSpeech;
   final int displayOrder;
   final String unitId;
-  final String typeTheory;
+  final String typeTheory; //grammar,flashcard,phrase
 
   Theory({
     required this.id,
@@ -21,7 +21,7 @@ class Theory {
     this.example,
     this.audio,
     this.translation,
-    this.pharseText,
+    this.phraseText,
     this.term,
     this.image,
     this.ipa,
@@ -39,7 +39,7 @@ class Theory {
       example: json['example'] as String?,
       audio: json['audio'] as String?,
       translation: json['translation'] as String?,
-      pharseText: json['pharseText'] as String?,
+      phraseText: json['phraseText'] as String?,
       term: json['term'] as String?,
       image: json['image'] as String?,
       ipa: json['ipa'] as String?,
@@ -58,7 +58,7 @@ class Theory {
       'example': example,
       'audio': audio,
       'translation': translation,
-      'pharseText': pharseText,
+      'phraseText': phraseText,
       'term': term,
       'image': image,
       'ipa': ipa,

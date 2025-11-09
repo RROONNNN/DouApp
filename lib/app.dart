@@ -1,6 +1,7 @@
 import 'package:duo_app/common/resources/app_colors.dart';
 import 'package:duo_app/configs/build_config.dart';
 import 'package:duo_app/di/injection.dart';
+import 'package:duo_app/entities/theory.dart';
 import 'package:duo_app/pages/bloc/app_bloc.dart';
 import 'package:duo_app/pages/bootstrap/bootstrap_cubit.dart';
 import 'package:duo_app/pages/bootstrap/bootstrap_state.dart';

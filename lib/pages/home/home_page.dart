@@ -49,6 +49,7 @@ class HomePage extends StatelessWidget {
                       description: state.units[index].description,
                       unitNumber: state.units[index].displayOrder.toString(),
                       backgroundColor: const Color(0xFF58C5F1),
+                      unitId: state.units[index].id,
                     ),
 
                     ListView.builder(

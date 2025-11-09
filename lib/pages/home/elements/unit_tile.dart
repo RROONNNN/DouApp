@@ -1,9 +1,10 @@
-import 'package:duo_app/pages/home/elements/theory_page.dart';
+import 'package:duo_app/entities/theory.dart';
 import 'package:duo_app/route/app_route.dart';
 import 'package:duo_app/route/navigator.dart';
 import 'package:flutter/material.dart';
 
 class UnitTile extends StatelessWidget {
+  final String unitId;
   final String title;
   final String description;
   final String? unitNumber;
@@ -11,6 +12,7 @@ class UnitTile extends StatelessWidget {
 
   const UnitTile({
     super.key,
+    required this.unitId,
     required this.title,
     required this.description,
     this.unitNumber,
@@ -37,12 +39,12 @@ class UnitTile extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) =>
-                    TheoryPage(title: title, unitNumber: unitNumber),
-              ),
-            );
+            // Navigator.of(context).push(
+            //   MaterialPageRoute(
+            //     builder: (_) =>
+            //         TheoryPage([]),
+            //   ),
+            // );
           },
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -96,7 +98,7 @@ class UnitTile extends StatelessWidget {
                     onPressed: () {
                       AppNavigator.pushNamed(
                         RouterName.theory,
-                        arguments: {'title': title, 'unitNumber': unitNumber},
+                        arguments: {'unitId': unitId},
                       );
                     },
                   ),
