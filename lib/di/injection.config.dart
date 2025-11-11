@@ -82,11 +82,14 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i373.LocalService>(),
       ),
     );
-    gh.lazySingleton<_i427.BootstrapCubit>(
-      () => _i427.BootstrapCubit(gh<_i373.LocalService>()),
-    );
     gh.factory<_i655.HomeCubit>(
       () => _i655.HomeCubit(learningService: gh<_i359.LearningService>()),
+    );
+    gh.lazySingleton<_i427.BootstrapCubit>(
+      () => _i427.BootstrapCubit(
+        gh<_i373.LocalService>(),
+        gh<_i557.PersistCookieJar>(instanceName: 'cookieJar'),
+      ),
     );
     gh.factoryParam<_i131.VerifyCodeCubit, String, dynamic>(
       (email, _) =>

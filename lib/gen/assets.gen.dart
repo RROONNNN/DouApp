@@ -11,6 +11,27 @@
 
 import 'package:flutter/widgets.dart';
 
+class $AssetsAnimationsGen {
+  const $AssetsAnimationsGen();
+
+  /// File path: assets/animations/LineSoundIconAnimations.json
+  String get lineSoundIconAnimations =>
+      'assets/animations/LineSoundIconAnimations.json';
+
+  /// File path: assets/animations/SmartOwlEducation.json
+  String get smartOwlEducation => 'assets/animations/SmartOwlEducation.json';
+
+  /// File path: assets/animations/loading_circle.json
+  String get loadingCircle => 'assets/animations/loading_circle.json';
+
+  /// List of all assets
+  List<String> get values => [
+    lineSoundIconAnimations,
+    smartOwlEducation,
+    loadingCircle,
+  ];
+}
+
 class $AssetsNavigationIconsGen {
   const $AssetsNavigationIconsGen();
 
@@ -47,6 +68,7 @@ class $AssetsNavigationIconsGen {
 class Assets {
   const Assets._();
 
+  static const $AssetsAnimationsGen animations = $AssetsAnimationsGen();
   static const AssetGenImage level = AssetGenImage('assets/level.png');
   static const AssetGenImage logo = AssetGenImage('assets/logo.png');
   static const $AssetsNavigationIconsGen navigationIcons =

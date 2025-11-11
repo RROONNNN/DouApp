@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:duo_app/data/remote/authentication/register_request.dart';
+import 'package:duo_app/entities/user.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../common/api_client/api_client.dart';
@@ -13,7 +14,7 @@ import 'authentication/login_response.dart';
 
 abstract class AuthenticationService {
   Future<DataState<bool>> login(LoginRequest data);
-  Future<DataState<LoginResponse>> refreshToken(String refreshToken);
+  Future<DataState<LoginResponse>> refreshToken();
   Future<DataState<String>> register(RegisterRequest data);
   Future<DataState<LoginResponse>> verifyEmail(String email, String code);
   Future<DataState<bool>> logout();
@@ -23,6 +24,7 @@ abstract class AuthenticationService {
     String code,
     String password,
   );
+  Future<DataState<User>> getProfile();
 }
 
 @LazySingleton(as: AuthenticationService)
@@ -30,6 +32,23 @@ class AuthenticationServiceImplement extends AuthenticationService {
   AuthenticationServiceImplement(this._apiClient);
 
   final ApiClient _apiClient;
+
+  @override
+  Future<DataState<User>> getProfile() async {
+    try {
+      final ApiResponse response = await _apiClient.get(
+        path: ApiEndpoint.getProfile,
+      );
+      if (response.isSuccess()) {
+        return DataSuccess<User>(
+          User.fromJson(response.value['data'] as Map<String, dynamic>),
+        );
+      }
+      return DataFailed<User>(response.error);
+    } catch (e) {
+      return DataFailed<User>(e.toString());
+    }
+  }
 
   @override
   Future<DataState<bool>> forgotPassword(String email) async {
@@ -146,15 +165,17 @@ class AuthenticationServiceImplement extends AuthenticationService {
   }
 
   @override
-  Future<DataState<LoginResponse>> refreshToken(String refreshToken) async {
+  Future<DataState<LoginResponse>> refreshToken() async {
     try {
       final ApiResponse response = await _apiClient.post(
         path: ApiEndpoint.refresh,
-        data: {'refresh_token': refreshToken},
+        isNotContentType: true,
       );
       if (response.isSuccess()) {
         return DataSuccess<LoginResponse>(
-          LoginResponse.fromJson(response.value as Map<String, dynamic>),
+          LoginResponse.fromJson(
+            response.data['value']["data"] as Map<String, dynamic>,
+          ),
         );
       }
       return DataFailed<LoginResponse>(response.error);

@@ -55,8 +55,14 @@ class ApiClient {
     Map<String, dynamic>? headers,
     ProgressCallback? onSendProgress,
     CancelToken? cancelToken,
+    bool isNotContentType = false,
   }) async {
-    dio.options.headers.addAll(headers ?? _defaultHeaders);
+    final requestHeaders = headers ?? _defaultHeaders;
+    if (isNotContentType) {
+      requestHeaders.remove('Content-Type');
+      dio.options.headers.remove('Content-Type');
+    }
+    dio.options.headers.addAll(requestHeaders);
 
     return responseWrapper(
       dio.post<dynamic>(
