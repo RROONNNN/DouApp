@@ -246,18 +246,10 @@ class ProfilePage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildInfoRow(Icons.fingerprint, 'User ID', user.id),
-                    const Divider(height: 24),
                     _buildInfoRow(
                       Icons.access_time,
                       'Last Active',
                       _formatDateTime(user.lastActiveAt),
-                    ),
-                    const Divider(height: 24),
-                    _buildInfoRow(
-                      Icons.update,
-                      'Last Updated',
-                      _formatDateTime(user.updatedAt),
                     ),
                     const Divider(height: 24),
                     _buildInfoRow(
