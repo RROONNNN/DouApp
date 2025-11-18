@@ -267,8 +267,9 @@ class ProfilePage extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
+                key: const Key('logout_button'),
                 onPressed: () {
-                  // TODO: Implement logout
+                  context.read<ProfileCubit>().logOut();
                 },
                 icon: const Icon(Icons.logout),
                 label: const Text('Logout'),
