@@ -205,8 +205,8 @@ void main() {
     ) async {
       await runLoggedTest(
         tester: tester,
-        testCaseId: 'TC_LOGIN_001',
-        module: 'Login',
+        testCaseId: 'TC_AUTH_001',
+        module: 'Authentication',
         scenario: 'Verify login page shows required widgets',
         body: () async {
           // Load app widget
@@ -236,8 +236,8 @@ void main() {
     ) async {
       await runLoggedTest(
         tester: tester,
-        testCaseId: 'TC_LOGIN_002',
-        module: 'Login',
+        testCaseId: 'TC_AUTH_002',
+        module: 'Authentication',
         scenario: 'Validate error shown when submitting empty login form',
         body: () async {
           await tester.pumpWidget(const MyApp());
@@ -257,11 +257,44 @@ void main() {
       );
     });
 
+    testWidgets('Password field toggle visibility works', (
+      WidgetTester tester,
+    ) async {
+      await runLoggedTest(
+        tester: tester,
+        testCaseId: 'TC_AUTH_007',
+        module: 'Authentication',
+        scenario: 'User can toggle password visibility icon',
+        body: () async {
+          await tester.pumpWidget(const MyApp());
+          await tester.pumpAndSettle(const Duration(seconds: 3));
+
+          // Find password field
+          final textFields = find.byType(TextFormField);
+          expect(textFields, findsAtLeastNWidgets(2));
+
+          // Enter password
+          await tester.enterText(textFields.last, 'TestPassword123!');
+          await tester.pumpAndSettle();
+
+          // Find the eye icon (password visibility toggle)
+          final eyeIcon = find.byIcon(Icons.remove_red_eye_rounded);
+          expect(eyeIcon, findsOneWidget);
+
+          // Tap to toggle visibility
+          await tester.tap(eyeIcon);
+          await tester.pumpAndSettle();
+
+          // Icon should change to outlined version
+          expect(find.byIcon(Icons.remove_red_eye_outlined), findsOneWidget);
+        },
+      );
+    });
     testWidgets('Can enter username and password', (WidgetTester tester) async {
       await runLoggedTest(
         tester: tester,
-        testCaseId: 'TC_LOGIN_003',
-        module: 'Login',
+        testCaseId: 'TC_AUTH_003',
+        module: 'Authentication',
         scenario: 'User can type username and password',
         body: () async {
           await tester.pumpWidget(const MyApp());
@@ -291,8 +324,8 @@ void main() {
     ) async {
       await runLoggedTest(
         tester: tester,
-        testCaseId: 'TC_LOGIN_004',
-        module: 'Login',
+        testCaseId: 'TC_AUTH_004',
+        module: 'Authentication',
         scenario: 'Forgot password link navigates to reset flow',
         body: () async {
           await tester.pumpWidget(const MyApp());
@@ -316,8 +349,8 @@ void main() {
     testWidgets('Can navigate to register page', (WidgetTester tester) async {
       await runLoggedTest(
         tester: tester,
-        testCaseId: 'TC_LOGIN_005',
-        module: 'Login',
+        testCaseId: 'TC_AUTH_005',
+        module: 'Authentication',
         scenario: 'Register link opens registration page',
         body: () async {
           await tester.pumpWidget(const MyApp());
@@ -337,7 +370,100 @@ void main() {
         },
       );
     });
+    testWidgets('Login button is enabled when form is filled', (
+      WidgetTester tester,
+    ) async {
+      await runLoggedTest(
+        tester: tester,
+        testCaseId: 'TC_AUTH_008',
+        module: 'Authentication',
+        scenario: 'Login button remains enabled after filling the form',
+        body: () async {
+          await tester.pumpWidget(const MyApp());
+          await tester.pumpAndSettle(const Duration(seconds: 3));
 
+          // Find login button
+          final loginButton = find.byType(ElevatedButton);
+          expect(loginButton, findsOneWidget);
+
+          // Button should be enabled
+          final button = tester.widget<ElevatedButton>(loginButton);
+          expect(button.onPressed, isNotNull);
+
+          // Fill form
+          final textFields = find.byType(TextFormField);
+          await tester.enterText(textFields.first, 'test@example.com');
+          await tester.enterText(textFields.last, 'Password123!');
+          await tester.pumpAndSettle();
+
+          // Button should still be enabled
+          final buttonAfter = tester.widget<ElevatedButton>(loginButton);
+          expect(buttonAfter.onPressed, isNotNull);
+        },
+      );
+    });
+
+    testWidgets('User can logout from profile page', (
+      WidgetTester tester,
+    ) async {
+      await runLoggedTest(
+        tester: tester,
+        testCaseId: 'TC_PROFILE_001',
+        module: 'Profile',
+        scenario:
+            'Login, navigate to profile tab, and logout back to login page',
+        body: () async {
+          tester.binding.reset();
+          await tester.pumpAndSettle(const Duration(seconds: 2));
+          await tester.pumpWidget(const MyApp());
+          await tester.pumpAndSettle(const Duration(seconds: 8));
+
+          final textFields = find.byType(TextFormField);
+          expect(textFields, findsAtLeastNWidgets(2));
+
+          await tester.enterText(textFields.first, 'tsarlvntn2004@gmail.com');
+          await tester.pumpAndSettle();
+
+          await tester.enterText(textFields.last, '123456789');
+          await tester.pumpAndSettle();
+
+          final loginButton = find.text('Login');
+          expect(loginButton, findsOneWidget);
+
+          await tester.tap(loginButton);
+          await tester.pumpAndSettle(const Duration(seconds: 4));
+
+          final navigationBar = find.byType(NavigationBar);
+          expect(navigationBar, findsOneWidget);
+
+          // Find profile tab by its icon image
+          final Finder profileTab = find.widgetWithImage(
+            NavigationDestination,
+            AssetImage(Assets.navigationIcons.navUser.path),
+          );
+          expect(profileTab, findsOneWidget);
+
+          await tester.tap(profileTab);
+          await tester.pumpAndSettle(const Duration(seconds: 5));
+
+          // Scroll down to the bottom to find logout button
+          final logoutButton = find.byKey(const Key('logout_button'));
+          await tester.scrollUntilVisible(
+            logoutButton,
+            500.0,
+            scrollable: find.byType(Scrollable),
+          );
+          await tester.pumpAndSettle();
+
+          expect(logoutButton, findsOneWidget);
+
+          await tester.tap(logoutButton);
+          await tester.pumpAndSettle(const Duration(seconds: 5));
+
+          expect(find.text('Login'), findsOneWidget);
+        },
+      );
+    });
     testWidgets('Complete login flow with valid credentials', (
       WidgetTester tester,
     ) async {
@@ -378,126 +504,6 @@ void main() {
               find.byType(SnackBar).evaluate().isNotEmpty;
 
           expect(hasNavigated, isTrue);
-        },
-      );
-    });
-
-    testWidgets('Password field toggle visibility works', (
-      WidgetTester tester,
-    ) async {
-      await runLoggedTest(
-        tester: tester,
-        testCaseId: 'TC_LOGIN_007',
-        module: 'Login',
-        scenario: 'User can toggle password visibility icon',
-        body: () async {
-          await tester.pumpWidget(const MyApp());
-          await tester.pumpAndSettle(const Duration(seconds: 3));
-
-          // Find password field
-          final textFields = find.byType(TextFormField);
-          expect(textFields, findsAtLeastNWidgets(2));
-
-          // Enter password
-          await tester.enterText(textFields.last, 'TestPassword123!');
-          await tester.pumpAndSettle();
-
-          // Find the eye icon (password visibility toggle)
-          final eyeIcon = find.byIcon(Icons.remove_red_eye_rounded);
-          expect(eyeIcon, findsOneWidget);
-
-          // Tap to toggle visibility
-          await tester.tap(eyeIcon);
-          await tester.pumpAndSettle();
-
-          // Icon should change to outlined version
-          expect(find.byIcon(Icons.remove_red_eye_outlined), findsOneWidget);
-        },
-      );
-    });
-
-    testWidgets('Login button is enabled when form is filled', (
-      WidgetTester tester,
-    ) async {
-      await runLoggedTest(
-        tester: tester,
-        testCaseId: 'TC_LOGIN_008',
-        module: 'Login',
-        scenario: 'Login button remains enabled after filling the form',
-        body: () async {
-          await tester.pumpWidget(const MyApp());
-          await tester.pumpAndSettle(const Duration(seconds: 3));
-
-          // Find login button
-          final loginButton = find.byType(ElevatedButton);
-          expect(loginButton, findsOneWidget);
-
-          // Button should be enabled
-          final button = tester.widget<ElevatedButton>(loginButton);
-          expect(button.onPressed, isNotNull);
-
-          // Fill form
-          final textFields = find.byType(TextFormField);
-          await tester.enterText(textFields.first, 'test@example.com');
-          await tester.enterText(textFields.last, 'Password123!');
-          await tester.pumpAndSettle();
-
-          // Button should still be enabled
-          final buttonAfter = tester.widget<ElevatedButton>(loginButton);
-          expect(buttonAfter.onPressed, isNotNull);
-        },
-      );
-    });
-
-    testWidgets('User can logout from profile page', (
-      WidgetTester tester,
-    ) async {
-      await runLoggedTest(
-        tester: tester,
-        testCaseId: 'TC_PROFILE_001',
-        module: 'Profile',
-        scenario:
-            'Login, navigate to profile tab, and logout back to login page',
-        body: () async {
-          await tester.pumpWidget(const MyApp());
-          await tester.pumpAndSettle(const Duration(seconds: 8));
-
-          final textFields = find.byType(TextFormField);
-          expect(textFields, findsAtLeastNWidgets(2));
-
-          await tester.enterText(textFields.first, 'tsarlvntn2004@gmail.com');
-          await tester.pumpAndSettle();
-
-          await tester.enterText(textFields.last, '123456789');
-          await tester.pumpAndSettle();
-
-          final loginButton = find.text('Login');
-          expect(loginButton, findsOneWidget);
-
-          await tester.tap(loginButton);
-          await tester.pumpAndSettle(const Duration(seconds: 4));
-
-          final navigationBar = find.byType(NavigationBar);
-          expect(navigationBar, findsOneWidget);
-
-          // Find profile tab by its icon image
-          final Finder profileTab = find.widgetWithImage(
-            NavigationDestination,
-            AssetImage(Assets.navigationIcons.navUser.path),
-          );
-          expect(profileTab, findsOneWidget);
-
-          await tester.tap(profileTab);
-          await tester.pumpAndSettle(const Duration(seconds: 5));
-
-          // Find logout button by finding the text first, then its ancestor OutlinedButton
-          final logoutButton = find.byKey(const Key('logout_button'));
-          expect(logoutButton, findsOneWidget);
-
-          await tester.tap(logoutButton);
-          await tester.pumpAndSettle(const Duration(seconds: 8));
-
-          expect(find.text('Login'), findsOneWidget);
         },
       );
     });

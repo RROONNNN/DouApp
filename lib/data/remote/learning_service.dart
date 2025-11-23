@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:duo_app/common/api_client/api_client.dart';
 import 'package:duo_app/data/remote/api_endpoint.dart';
 import 'package:duo_app/entities/course.dart';
+import 'package:duo_app/entities/question.dart';
 import 'package:duo_app/entities/theory.dart';
 import 'package:duo_app/entities/unit.dart';
 import 'package:injectable/injectable.dart';
@@ -12,6 +13,24 @@ class LearningService {
   final ApiClient _apiClient;
 
   LearningService(this._apiClient);
+
+  Future<List<Question>> getQuestions(String lessonId) async {
+    try {
+      final response = await _apiClient.get(
+        path: '${ApiEndpoint.getQuestions}/$lessonId',
+      );
+      if (response.isSuccess()) {
+        final value = response.value as Map<String, dynamic>;
+        final questionsJson = value['data'] as List<dynamic>? ?? [];
+        return questionsJson.map((json) => Question.fromJson(json)).toList();
+      }
+      log('getQuestions fail : ${response.error}');
+      return [];
+    } catch (e) {
+      log('Error getQuestions : $e');
+      rethrow;
+    }
+  }
 
   Future<List<Course>> getCourses({
     int pageSize = 10,
@@ -47,7 +66,7 @@ class LearningService {
       );
       if (response.isSuccess()) {
         final value = response.value as Map<String, dynamic>;
-        final unitsJson = value['data'] as List<dynamic>? ?? [];
+        final unitsJson = value['data']['items'] as List<dynamic>? ?? [];
         return unitsJson.map((json) => Unit.fromJson(json)).toList();
       }
       log('getUnitsByCourseId fail : ${response.error}');

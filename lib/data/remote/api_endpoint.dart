@@ -13,4 +13,5 @@ class ApiEndpoint {
   static const String getUnitsByCourseId = '/api/units/user';
   static const String getTheoriesByUnitId = '/api/theories/user';
   static const String getProfile = '/api/auth/profile';
+  static const String getQuestions = '/api/questions/user';
 }

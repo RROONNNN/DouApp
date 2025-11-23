@@ -2,7 +2,9 @@ import 'dart:math';
 
 import 'package:duo_app/data/remote/learning_service.dart';
 import 'package:duo_app/di/injection.dart';
+import 'package:duo_app/pages/home/answer_page.dart';
 import 'package:duo_app/pages/home/cubit/home_cubit.dart';
+import 'package:duo_app/pages/home/elements/animated_button.dart';
 import 'package:duo_app/pages/home/elements/unit_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,18 +27,6 @@ class HomePage extends StatelessWidget {
             IconButton(icon: const Icon(Icons.menu_book), onPressed: () {}),
           ],
         ),
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: () async {
-        //     LearningService learningService = getIt<LearningService>();
-        //     final theories = await learningService.getTheoriesByUnitId(
-        //       defaultUnitId,
-        //     );
-        //     for (var t in theories) {
-        //       print(t);
-        //     }
-        //   },
-        //   child: const Icon(Icons.play_arrow),
-        // ),
         body: BlocBuilder<HomeCubit, HomeState>(
           builder: (context, state) {
             return ListView.builder(
@@ -58,17 +48,30 @@ class HomePage extends StatelessWidget {
                       itemBuilder: (context, lessonIndex) {
                         final offset =
                             _offsetCalculator(lessonIndex) * halfMaxWidth;
+                        final lessonId =
+                            state.units[index].lessons[lessonIndex].id;
                         return Padding(
                           padding: EdgeInsets.only(
                             left: offset < 0 ? -offset : 0,
                             right: offset > 0 ? offset : 0,
-                            bottom: 8,
+                            bottom: 18,
                           ),
-                          child: Image.asset(
-                            'assets/level.png',
-                            width: 60,
+                          child: AnimatedButton(
                             height: 60,
-                            fit: BoxFit.contain,
+                            width: 60,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      AnswerPage(lessonId: lessonId),
+                                ),
+                              );
+                            },
+                            child: Image.asset(
+                              'assets/level.png',
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         );
                       },

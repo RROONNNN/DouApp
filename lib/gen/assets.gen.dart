@@ -69,13 +69,14 @@ class Assets {
   const Assets._();
 
   static const $AssetsAnimationsGen animations = $AssetsAnimationsGen();
+  static const String example = 'assets/example.json';
   static const AssetGenImage level = AssetGenImage('assets/level.png');
   static const AssetGenImage logo = AssetGenImage('assets/logo.png');
   static const $AssetsNavigationIconsGen navigationIcons =
       $AssetsNavigationIconsGen();
 
   /// List of all assets
-  static List<AssetGenImage> get values => [level, logo];
+  static List<dynamic> get values => [example, level, logo];
 }
 
 class AssetGenImage {

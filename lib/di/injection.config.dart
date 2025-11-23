@@ -1,5 +1,5 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format width=80
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
 // InjectableConfigGenerator
@@ -20,6 +20,7 @@ import 'package:duo_app/data/remote/learning_service.dart' as _i359;
 import 'package:duo_app/di/modules.dart' as _i920;
 import 'package:duo_app/pages/bloc/app_bloc.dart' as _i230;
 import 'package:duo_app/pages/bootstrap/bootstrap_cubit.dart' as _i427;
+import 'package:duo_app/pages/home/cubit/answer_cubit.dart' as _i1055;
 import 'package:duo_app/pages/home/cubit/home_cubit.dart' as _i655;
 import 'package:duo_app/pages/login/bloc/login_bloc.dart' as _i537;
 import 'package:duo_app/pages/login/cubit/change_password_cubit.dart' as _i351;
@@ -81,6 +82,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i432.AuthenticationService>(),
         gh<_i373.LocalService>(),
       ),
+    );
+    gh.factory<_i1055.AnswerCubit>(
+      () => _i1055.AnswerCubit(learningService: gh<_i359.LearningService>()),
     );
     gh.factory<_i655.HomeCubit>(
       () => _i655.HomeCubit(learningService: gh<_i359.LearningService>()),

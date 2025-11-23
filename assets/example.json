@@ -1,0 +1,35 @@
+[
+    {
+        "_id": "68f21a9f88f6fc2190113399",
+        "lessonId": "68e3d5151e0f222e56af06f2",
+        "correctAnswer": "house",
+        "answers": [
+            "house",
+            "school",
+            "hospital",
+            "market"
+        ],
+        "mediaUrl": "https://cdn.houseplansservices.com/content/ohg9heor4acrcqs00jdmdi5are/w384x256.jpg",
+        "displayOrder": 2,
+        "typeQuestion": "multiple_choice",
+        "updatedAt": "2025-10-17T10:29:51.143Z",
+        "createdAt": "2025-10-17T10:29:51.143Z",
+        "__v": 0
+    },
+    {
+        "_id": "68f21aca88f6fc219011339d",
+        "lessonId": "68e3d5151e0f222e56af06f2",
+        "fragmentText": [
+            "yesterday",
+            "played",
+            "football",
+            "He"
+        ],
+        "exactFragmentText": "He played football yesterday",
+        "displayOrder": 3,
+        "typeQuestion": "ordering",
+        "updatedAt": "2025-10-17T10:30:34.519Z",
+        "createdAt": "2025-10-17T10:30:34.519Z",
+        "__v": 0
+    }
+]
