@@ -165,6 +165,51 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 32),
+
+                    // Divider with "OR"
+                    Row(
+                      children: [
+                        Expanded(child: Divider(color: Colors.grey[300])),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            'OR',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        Expanded(child: Divider(color: Colors.grey[300])),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Google Sign-In Button
+                    OutlinedButton.icon(
+                      onPressed: () => _bloc.googleSignIn(),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(200, 50),
+                        side: BorderSide(color: Colors.grey[300]!),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      icon: Image.asset(
+                        'assets/google.svg',
+                        height: 24,
+                        width: 24,
+                      ),
+                      label: const Text(
+                        'Continue with Google',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

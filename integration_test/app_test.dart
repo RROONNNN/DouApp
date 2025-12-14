@@ -262,7 +262,7 @@ void main() {
     ) async {
       await runLoggedTest(
         tester: tester,
-        testCaseId: 'TC_AUTH_007',
+        testCaseId: 'TC_AUTH_003',
         module: 'Authentication',
         scenario: 'User can toggle password visibility icon',
         body: () async {
@@ -293,7 +293,7 @@ void main() {
     testWidgets('Can enter username and password', (WidgetTester tester) async {
       await runLoggedTest(
         tester: tester,
-        testCaseId: 'TC_AUTH_003',
+        testCaseId: 'TC_AUTH_004',
         module: 'Authentication',
         scenario: 'User can type username and password',
         body: () async {
@@ -324,7 +324,7 @@ void main() {
     ) async {
       await runLoggedTest(
         tester: tester,
-        testCaseId: 'TC_AUTH_004',
+        testCaseId: 'TC_AUTH_005',
         module: 'Authentication',
         scenario: 'Forgot password link navigates to reset flow',
         body: () async {
@@ -349,7 +349,7 @@ void main() {
     testWidgets('Can navigate to register page', (WidgetTester tester) async {
       await runLoggedTest(
         tester: tester,
-        testCaseId: 'TC_AUTH_005',
+        testCaseId: 'TC_AUTH_006',
         module: 'Authentication',
         scenario: 'Register link opens registration page',
         body: () async {
@@ -375,7 +375,7 @@ void main() {
     ) async {
       await runLoggedTest(
         tester: tester,
-        testCaseId: 'TC_AUTH_008',
+        testCaseId: 'TC_AUTH_007',
         module: 'Authentication',
         scenario: 'Login button remains enabled after filling the form',
         body: () async {

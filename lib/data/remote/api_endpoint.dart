@@ -1,6 +1,7 @@
 class ApiEndpoint {
-  static const String baseUrl = 'http://192.168.137.1:3000/';
+  static const String baseUrl = 'https://api-gateway.nhaxehaihong.top/';
   static const String login = '/api/auth/login';
+  static const String googleLogin = '/api/auth/login-google';
   static const String register = '/api/auth/register';
   static const String verifyEmail = '/api/auth/verify-email';
   static const String resendCode = '/api/auth/resend-verification-code';

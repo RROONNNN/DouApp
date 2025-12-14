@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import 'package:duo_app/data/remote/authentication/google_login_request.dart';
 import 'package:duo_app/data/remote/authentication/register_request.dart';
 import 'package:duo_app/entities/user.dart';
 import 'package:injectable/injectable.dart';
@@ -14,6 +15,7 @@ import 'authentication/login_response.dart';
 
 abstract class AuthenticationService {
   Future<DataState<bool>> login(LoginRequest data);
+  Future<DataState<bool>> googleLogin(GoogleLoginRequest data);
   Future<DataState<LoginResponse>> refreshToken();
   Future<DataState<String>> register(RegisterRequest data);
   Future<DataState<LoginResponse>> verifyEmail(String email, String code);
@@ -122,6 +124,24 @@ class AuthenticationServiceImplement extends AuthenticationService {
   }
 
   @override
+  Future<DataState<bool>> googleLogin(GoogleLoginRequest data) async {
+    try {
+      final ApiResponse response = await _apiClient.post(
+        path: ApiEndpoint.googleLogin,
+        data: data.toJson(),
+      );
+      if (response.isSuccess()) {
+        return const DataSuccess<bool>(true);
+      }
+      return DataFailed<bool>(response.error);
+    } on DioException catch (e) {
+      return DataFailed<bool>(e.message);
+    } on Exception catch (e) {
+      return DataFailed<bool>(e.toString());
+    }
+  }
+
+  @override
   Future<DataState<String>> register(RegisterRequest data) async {
     try {
       final ApiResponse response = await _apiClient.post(
@@ -151,7 +171,9 @@ class AuthenticationServiceImplement extends AuthenticationService {
       );
       if (response.isSuccess()) {
         return DataSuccess<LoginResponse>(
-          LoginResponse.fromJson(response.value as Map<String, dynamic>),
+          LoginResponse.fromJson(
+            response.value['data'] as Map<String, dynamic>,
+          ),
         );
       }
       return DataFailed<LoginResponse>(response.error);
