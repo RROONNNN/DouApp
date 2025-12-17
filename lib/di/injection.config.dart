@@ -44,7 +44,6 @@ extension GetItInjectableX on _i174.GetIt {
       () => injectableModule.prefs,
       preResolve: true,
     );
-    gh.singleton<_i230.AppBloc>(() => _i230.AppBloc());
     gh.lazySingleton<_i361.Dio>(() => injectableModule.dio);
     await gh.factoryAsync<_i557.PersistCookieJar>(
       () => injectableModule.cookieJar,
@@ -83,11 +82,11 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i373.LocalService>(),
       ),
     );
-    gh.factory<_i1055.AnswerCubit>(
-      () => _i1055.AnswerCubit(learningService: gh<_i359.LearningService>()),
-    );
     gh.factory<_i655.HomeCubit>(
       () => _i655.HomeCubit(learningService: gh<_i359.LearningService>()),
+    );
+    gh.factory<_i1055.AnswerCubit>(
+      () => _i1055.AnswerCubit(learningService: gh<_i359.LearningService>()),
     );
     gh.lazySingleton<_i427.BootstrapCubit>(
       () => _i427.BootstrapCubit(
@@ -101,6 +100,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i940.ForgotPasswordCubit>(
       () => _i940.ForgotPasswordCubit(gh<_i432.AuthenticationService>()),
+    );
+    gh.singleton<_i230.AppBloc>(
+      () => _i230.AppBloc(gh<_i432.AuthenticationService>()),
     );
     gh.factory<_i900.ProfileCubit>(
       () => _i900.ProfileCubit(gh<_i432.AuthenticationService>()),

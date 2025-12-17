@@ -101,7 +101,7 @@ class _AnswerPageState extends State<AnswerPage> {
           // Success - route to appropriate question type
           final question = state.currentQuestion;
 
-          if (question == null) {
+          if (state.isQuizComplete) {
             // Quiz completed - show completion screen
             return _buildCompletionScreen(state);
           }
@@ -112,7 +112,7 @@ class _AnswerPageState extends State<AnswerPage> {
               child: Column(
                 children: [
                   _buildProgressBar(state),
-                  Expanded(child: _buildQuestionWidget(question, state)),
+                  Expanded(child: _buildQuestionWidget(question!, state)),
                 ],
               ),
             ),
@@ -142,7 +142,7 @@ class _AnswerPageState extends State<AnswerPage> {
                 onPressed: () => Navigator.pop(context),
               ),
               Text(
-                '${state.answeredCorrectly.length} / ${state.totalQuestions}',
+                '${state.answeredCorrectly} / ${state.totalQuestions}',
                 style: AppDesignSystem.titleMedium.copyWith(
                   color: AppDesignSystem.textPrimary,
                   fontWeight: FontWeight.bold,
@@ -155,7 +155,7 @@ class _AnswerPageState extends State<AnswerPage> {
           ClipRRect(
             borderRadius: BorderRadius.circular(AppDesignSystem.radiusSmall),
             child: LinearProgressIndicator(
-              value: state.progress,
+              value: state.answeredCorrectly / state.totalQuestions,
               minHeight: 8,
               backgroundColor: AppDesignSystem.surfaceLight,
               valueColor: AlwaysStoppedAnimation<Color>(
@@ -169,7 +169,7 @@ class _AnswerPageState extends State<AnswerPage> {
   }
 
   Widget _buildQuestionWidget(Question question, AnswerState state) {
-    final isAnswered = state.answeredCorrectly.contains(question.id);
+    // final isAnswered = state.questions.any((q) => q.id == question.id);
 
     if (question.typeQuestion == TypeQuestion.multipleChoice) {
       return MultipleChoicePage(
@@ -177,7 +177,6 @@ class _AnswerPageState extends State<AnswerPage> {
         question: question,
         onCorrect: () => _handleCorrectAnswer(question.id),
         onWrong: () => _handleWrongAnswer(question.id),
-        isAnswered: isAnswered,
       );
     } else if (question.typeQuestion == TypeQuestion.ordering) {
       return OrderingPage(
@@ -351,7 +350,9 @@ class _AnswerPageState extends State<AnswerPage> {
                         width: double.infinity,
                         height: 56,
                         child: OutlinedButton(
-                          onPressed: () => _answerCubit.resetQuiz(),
+                          onPressed: () => _answerCubit.resetQuiz(
+                            state.currentQuestion?.id ?? '',
+                          ),
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(
                               color: AppDesignSystem.primaryGreen,
@@ -417,12 +418,10 @@ class MultipleChoicePage extends StatelessWidget {
     required this.question,
     required this.onCorrect,
     required this.onWrong,
-    this.isAnswered = false,
   });
   final Question question;
   final VoidCallback onCorrect;
   final VoidCallback onWrong;
-  final bool isAnswered;
 
   @override
   Widget build(BuildContext context) {
@@ -448,11 +447,11 @@ class MultipleChoicePage extends StatelessWidget {
               child: CachedNetworkImage(
                 height: 240,
                 width: double.infinity,
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
                 imageUrl: question.mediaUrl ?? '',
                 placeholder: (context, url) => Container(
                   height: 240,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,

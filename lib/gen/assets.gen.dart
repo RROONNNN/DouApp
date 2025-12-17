@@ -65,18 +65,34 @@ class $AssetsNavigationIconsGen {
   ];
 }
 
+class $AssetsSoundsGen {
+  const $AssetsSoundsGen();
+
+  /// File path: assets/sounds/correct.mp3
+  String get correct => 'assets/sounds/correct.mp3';
+
+  /// File path: assets/sounds/wrong.mp3
+  String get wrong => 'assets/sounds/wrong.mp3';
+
+  /// List of all assets
+  List<String> get values => [correct, wrong];
+}
+
 class Assets {
   const Assets._();
 
+  static const String aEnv = '.env';
   static const $AssetsAnimationsGen animations = $AssetsAnimationsGen();
   static const String example = 'assets/example.json';
+  static const String google = 'assets/google.svg';
   static const AssetGenImage level = AssetGenImage('assets/level.png');
   static const AssetGenImage logo = AssetGenImage('assets/logo.png');
   static const $AssetsNavigationIconsGen navigationIcons =
       $AssetsNavigationIconsGen();
+  static const $AssetsSoundsGen sounds = $AssetsSoundsGen();
 
   /// List of all assets
-  static List<dynamic> get values => [example, level, logo];
+  static List<dynamic> get values => [aEnv, example, google, level, logo];
 }
 
 class AssetGenImage {
