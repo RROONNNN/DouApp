@@ -1,3 +1,21 @@
+class MatchingItem {
+  final String value;
+  final String pairId;
+
+  MatchingItem({required this.value, required this.pairId});
+
+  factory MatchingItem.fromJson(Map<String, dynamic> json) {
+    return MatchingItem(
+      value: json['value'] as String,
+      pairId: json['pairId'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'value': value, 'pairId': pairId};
+  }
+}
+
 enum TypeQuestion { multipleChoice, matching, gap, ordering }
 
 extension TypeQuestionExtension on TypeQuestion {
@@ -42,6 +60,8 @@ class Question {
   final TypeQuestion typeQuestion;
   final DateTime updatedAt;
   final DateTime createdAt;
+  final List<MatchingItem>? leftText;
+  final List<MatchingItem>? rightText;
 
   Question({
     required this.id,
@@ -55,6 +75,8 @@ class Question {
     required this.createdAt,
     required this.exactFragmentText,
     required this.fragmentText,
+    this.leftText,
+    this.rightText,
   });
 
   factory Question.fromJson(Map<String, dynamic> json) {
@@ -76,6 +98,12 @@ class Question {
       fragmentText: (json['fragmentText'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
+      leftText: (json['leftText'] as List<dynamic>?)
+          ?.map((e) => MatchingItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      rightText: (json['rightText'] as List<dynamic>?)
+          ?.map((e) => MatchingItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -92,6 +120,8 @@ class Question {
       'createdAt': createdAt.toIso8601String(),
       'exactFragmentText': exactFragmentText,
       'fragmentText': fragmentText,
+      'leftText': leftText?.map((e) => e.toJson()).toList(),
+      'rightText': rightText?.map((e) => e.toJson()).toList(),
     };
   }
 }
