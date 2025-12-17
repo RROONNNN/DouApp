@@ -154,11 +154,6 @@ class ProfilePage extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _buildBadge(
-                          user.role.toUpperCase(),
-                          Colors.blue,
-                          Icons.badge_outlined,
-                        ),
                         const SizedBox(width: 12),
                         _buildBadge(
                           user.isActive ? 'ACTIVE' : 'INACTIVE',

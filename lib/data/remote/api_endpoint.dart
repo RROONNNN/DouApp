@@ -15,4 +15,5 @@ class ApiEndpoint {
   static const String getTheoriesByUnitId = '/api/theories/user';
   static const String getProfile = '/api/auth/profile';
   static const String getQuestions = '/api/questions/user';
+  static const String patchProgress = '/api/progress';
 }

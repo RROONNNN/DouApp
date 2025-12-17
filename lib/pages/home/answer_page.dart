@@ -1,10 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:duo_app/common/enums/request_status.dart';
+import 'package:duo_app/common/resources/app_design_system.dart';
 import 'package:duo_app/di/injection.dart';
 import 'package:duo_app/entities/question.dart';
 import 'package:duo_app/pages/home/cubit/answer_cubit.dart';
+import 'package:duo_app/pages/home/elements/gap_filling_page.dart';
+import 'package:duo_app/pages/home/elements/matching_page.dart';
+import 'package:duo_app/pages/home/elements/ordering_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class AnswerPage extends StatefulWidget {
   final String lessonId;
@@ -16,11 +21,42 @@ class AnswerPage extends StatefulWidget {
 
 class _AnswerPageState extends State<AnswerPage> {
   late final AnswerCubit _answerCubit;
+  late final AudioPlayer _audioPlayer;
 
   @override
   void initState() {
     super.initState();
     _answerCubit = getIt<AnswerCubit>()..initialize(widget.lessonId);
+    _audioPlayer = AudioPlayer();
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  Future<void> _playSound(bool isCorrect) async {
+    try {
+      await _audioPlayer.stop();
+      if (isCorrect) {
+        await _audioPlayer.play(AssetSource('sounds/correct.mp3'));
+      } else {
+        await _audioPlayer.play(AssetSource('sounds/wrong.mp3'));
+      }
+    } catch (e) {
+      debugPrint('Error playing sound: $e');
+    }
+  }
+
+  void _handleCorrectAnswer(String questionId) {
+    _playSound(true);
+    _answerCubit.answerCorrectly(questionId);
+  }
+
+  void _handleWrongAnswer(String questionId) {
+    _playSound(false);
+    _answerCubit.answerIncorrectly(questionId);
   }
 
   @override
@@ -30,8 +66,26 @@ class _AnswerPageState extends State<AnswerPage> {
       child: BlocBuilder<AnswerCubit, AnswerState>(
         builder: (context, state) {
           if (state.status == RequestStatus.requesting) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
+            return Scaffold(
+              body: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      AppDesignSystem.surfaceLight,
+                      AppDesignSystem.surfaceWhite,
+                    ],
+                  ),
+                ),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppDesignSystem.primaryGreen,
+                    ),
+                  ),
+                ),
+              ),
             );
           }
 
@@ -44,89 +98,540 @@ class _AnswerPageState extends State<AnswerPage> {
           if (state.status == RequestStatus.initial) {
             return const Scaffold(body: SizedBox());
           }
-
           // Success - route to appropriate question type
           final question = state.currentQuestion;
 
           if (question == null) {
-            // Quiz completed
-            return Scaffold(
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.check_circle,
-                      size: 80,
-                      color: Colors.green,
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Quiz Completed!',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'You answered ${state.questions.length} questions',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 32,
-                          vertical: 16,
-                        ),
-                      ),
-                      child: const Text(
-                        'Back to Home',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
+            // Quiz completed - show completion screen
+            return _buildCompletionScreen(state);
           }
-
-          if (question.typeQuestion == TypeQuestion.ordering) {
-            return Scaffold(
-              backgroundColor: Colors.white,
-              body: SafeArea(
-                child: OrderingPage(
-                  question: question,
-                  questionNumber: state.currentQuestionIndex + 1,
-                  totalQuestions: state.questions.length,
-                  onComplete: () => context.read<AnswerCubit>().nextQuestion(),
-                ),
+          // Render the appropriate question type with progress bar
+          return Scaffold(
+            backgroundColor: Colors.white,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  _buildProgressBar(state),
+                  Expanded(child: _buildQuestionWidget(question, state)),
+                ],
               ),
-            );
-          } else if (question.typeQuestion == TypeQuestion.multipleChoice) {
-            return MultipleChoicePage(
-              question: question,
-              questionNumber: state.currentQuestionIndex + 1,
-              totalQuestions: state.questions.length,
-              onComplete: () => context.read<AnswerCubit>().nextQuestion(),
-            );
-          } else if (question.typeQuestion == TypeQuestion.matching) {
-            return MatchingPage(
-              question: question,
-              questionNumber: state.currentQuestionIndex + 1,
-              totalQuestions: state.questions.length,
-              onComplete: () => context.read<AnswerCubit>().nextQuestion(),
-            );
-          }
-
-          return const Scaffold(
-            body: Center(child: Text('Question type not supported')),
+            ),
           );
         },
       ),
+    );
+  }
+
+  Widget _buildProgressBar(AnswerState state) {
+    return Container(
+      padding: const EdgeInsets.all(AppDesignSystem.spacing16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: AppDesignSystem.shadowLow,
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(
+                  Icons.close,
+                  color: AppDesignSystem.textSecondary,
+                ),
+                onPressed: () => Navigator.pop(context),
+              ),
+              Text(
+                '${state.answeredCorrectly.length} / ${state.totalQuestions}',
+                style: AppDesignSystem.titleMedium.copyWith(
+                  color: AppDesignSystem.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 48), // Balance the close button
+            ],
+          ),
+          const SizedBox(height: AppDesignSystem.spacing8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppDesignSystem.radiusSmall),
+            child: LinearProgressIndicator(
+              value: state.progress,
+              minHeight: 8,
+              backgroundColor: AppDesignSystem.surfaceLight,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                AppDesignSystem.primaryGreen,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuestionWidget(Question question, AnswerState state) {
+    final isAnswered = state.answeredCorrectly.contains(question.id);
+
+    if (question.typeQuestion == TypeQuestion.multipleChoice) {
+      return MultipleChoicePage(
+        key: Key(question.id),
+        question: question,
+        onCorrect: () => _handleCorrectAnswer(question.id),
+        onWrong: () => _handleWrongAnswer(question.id),
+        isAnswered: isAnswered,
+      );
+    } else if (question.typeQuestion == TypeQuestion.ordering) {
+      return OrderingPage(
+        key: Key(question.id),
+        question: question,
+        onComplete: () => _handleCorrectAnswer(question.id),
+      );
+    } else if (question.typeQuestion == TypeQuestion.matching) {
+      return MatchingPage(
+        key: Key(question.id),
+        question: question,
+        onComplete: () => _handleCorrectAnswer(question.id),
+      );
+    } else if (question.typeQuestion == TypeQuestion.gap) {
+      return GapFillingPage(
+        key: Key(question.id),
+        question: question,
+        onComplete: () => _handleCorrectAnswer(question.id),
+      );
+    }
+    return const Center(child: Text('Question type not supported'));
+  }
+
+  Widget _buildCompletionScreen(AnswerState state) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppDesignSystem.surfaceLight,
+              AppDesignSystem.surfaceWhite,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(AppDesignSystem.spacing32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Success animation with trophy
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 800),
+                    curve: Curves.elasticOut,
+                    builder: (context, value, child) {
+                      return Transform.scale(
+                        scale: value,
+                        child: Container(
+                          padding: const EdgeInsets.all(
+                            AppDesignSystem.spacing40,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: AppDesignSystem.successGradient,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppDesignSystem.primaryGreen.withOpacity(
+                                  0.3,
+                                ),
+                                blurRadius: 24,
+                                spreadRadius: 8,
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.emoji_events_rounded,
+                            size: 100,
+                            color: Colors.white,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: AppDesignSystem.spacing40),
+
+                  // Congratulations text
+                  Text(
+                    'Congratulations!',
+                    style: AppDesignSystem.displayMedium.copyWith(
+                      color: AppDesignSystem.primaryGreen,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: AppDesignSystem.spacing12),
+                  Text(
+                    'Quiz Completed',
+                    style: AppDesignSystem.titleLarge.copyWith(
+                      color: AppDesignSystem.textSecondary,
+                    ),
+                  ),
+
+                  const SizedBox(height: AppDesignSystem.spacing32),
+
+                  // Stats card
+                  Container(
+                    padding: const EdgeInsets.all(AppDesignSystem.spacing24),
+                    decoration: AppDesignSystem.cardDecoration(
+                      shadows: AppDesignSystem.shadowMedium,
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _buildStatItem(
+                              Icons.check_circle_rounded,
+                              '${state.totalQuestions}',
+                              'Questions',
+                              AppDesignSystem.primaryGreen,
+                            ),
+                            Container(
+                              width: 1,
+                              height: 40,
+                              color: AppDesignSystem.surfaceLight,
+                            ),
+                            _buildStatItem(
+                              Icons.stars_rounded,
+                              '100%',
+                              'Accuracy',
+                              AppDesignSystem.accentOrange,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: AppDesignSystem.spacing48),
+
+                  // Buttons
+                  Column(
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: AppDesignSystem.greenGradient,
+                            borderRadius: BorderRadius.circular(
+                              AppDesignSystem.radiusMedium,
+                            ),
+                            boxShadow: AppDesignSystem.shadowMedium,
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  AppDesignSystem.radiusMedium,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              'Continue Learning',
+                              style: AppDesignSystem.titleLarge.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: AppDesignSystem.spacing16),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: OutlinedButton(
+                          onPressed: () => _answerCubit.resetQuiz(),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(
+                              color: AppDesignSystem.primaryGreen,
+                              width: 2,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                AppDesignSystem.radiusMedium,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            'Retry Quiz',
+                            style: AppDesignSystem.titleLarge.copyWith(
+                              color: AppDesignSystem.primaryGreen,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatItem(
+    IconData icon,
+    String value,
+    String label,
+    Color color,
+  ) {
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 32),
+        const SizedBox(height: AppDesignSystem.spacing8),
+        Text(
+          value,
+          style: AppDesignSystem.headlineLarge.copyWith(
+            color: AppDesignSystem.textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: AppDesignSystem.bodyMedium.copyWith(
+            color: AppDesignSystem.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class MultipleChoicePage extends StatelessWidget {
+  const MultipleChoicePage({
+    super.key,
+    required this.question,
+    required this.onCorrect,
+    required this.onWrong,
+    this.isAnswered = false,
+  });
+  final Question question;
+  final VoidCallback onCorrect;
+  final VoidCallback onWrong;
+  final bool isAnswered;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [AppDesignSystem.surfaceLight, AppDesignSystem.surfaceWhite],
+        ),
+      ),
+      child: Column(
+        children: [
+          // Image Section with modern styling
+          Container(
+            margin: const EdgeInsets.all(AppDesignSystem.spacing16),
+            decoration: AppDesignSystem.cardDecoration(
+              shadows: AppDesignSystem.shadowHigh,
+              borderRadius: AppDesignSystem.radiusLarge,
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppDesignSystem.radiusLarge),
+              child: CachedNetworkImage(
+                height: 240,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                imageUrl: question.mediaUrl ?? '',
+                placeholder: (context, url) => Container(
+                  height: 240,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppDesignSystem.surfaceGrey,
+                        AppDesignSystem.surfaceLight,
+                      ],
+                    ),
+                  ),
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppDesignSystem.primaryGreen,
+                      ),
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  height: 240,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppDesignSystem.surfaceGrey,
+                        AppDesignSystem.surfaceLight,
+                      ],
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.image_not_supported_rounded,
+                    size: 64,
+                    color: AppDesignSystem.textTertiary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Question prompt
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDesignSystem.spacing24,
+              vertical: AppDesignSystem.spacing16,
+            ),
+            child: Text(
+              'Choose the correct answer',
+              style: AppDesignSystem.titleLarge.copyWith(
+                color: AppDesignSystem.textSecondary,
+              ),
+            ),
+          ),
+
+          // Answer Grid
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(AppDesignSystem.spacing16),
+              child: GridView.builder(
+                itemCount: question.answers?.length ?? 0,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 1.3,
+                  crossAxisSpacing: AppDesignSystem.spacing16,
+                  mainAxisSpacing: AppDesignSystem.spacing16,
+                ),
+                itemBuilder: (context, index) {
+                  return _AnimatedAnswerButton(
+                    answer: question.answers?[index] ?? '',
+                    onPressed: () {
+                      if (question.answers?[index] == question.correctAnswer) {
+                        onCorrect();
+                      } else {
+                        onWrong();
+                      }
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AnimatedAnswerButton extends StatefulWidget {
+  final String answer;
+  final VoidCallback onPressed;
+
+  const _AnimatedAnswerButton({required this.answer, required this.onPressed});
+
+  @override
+  State<_AnimatedAnswerButton> createState() => _AnimatedAnswerButtonState();
+}
+
+class _AnimatedAnswerButtonState extends State<_AnimatedAnswerButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  bool _isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: AppDesignSystem.animationFast,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: Duration(milliseconds: 300 + (50)),
+      curve: Curves.easeOutBack,
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: value,
+          child: GestureDetector(
+            onTapDown: (_) {
+              setState(() => _isPressed = true);
+              _controller.forward();
+            },
+            onTapUp: (_) {
+              setState(() => _isPressed = false);
+              _controller.reverse();
+              Future.delayed(AppDesignSystem.animationFast, widget.onPressed);
+            },
+            onTapCancel: () {
+              setState(() => _isPressed = false);
+              _controller.reverse();
+            },
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: 1.0 - (_controller.value * 0.05),
+                  child: Container(
+                    decoration: AppDesignSystem.cardDecoration(
+                      gradient: _isPressed
+                          ? AppDesignSystem.blueGradient
+                          : null,
+                      color: _isPressed ? null : AppDesignSystem.surfaceWhite,
+                      shadows: _isPressed
+                          ? AppDesignSystem.shadowLow
+                          : AppDesignSystem.shadowMedium,
+                    ),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(
+                          AppDesignSystem.spacing16,
+                        ),
+                        child: Text(
+                          widget.answer,
+                          style: AppDesignSystem.titleMedium.copyWith(
+                            color: _isPressed
+                                ? Colors.white
+                                : AppDesignSystem.textPrimary,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }

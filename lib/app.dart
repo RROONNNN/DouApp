@@ -67,6 +67,7 @@ class _MyAppState extends State<MyApp> {
     switch (state.status) {
       case BootstrapStatus.authenticated:
         Future.delayed(const Duration(seconds: 2)).then((value) {
+          _appBloc.loadProfile();
           AppNavigator.pushNamedAndRemoveUntil(
             RouterName.navigation,
             (_) => false,

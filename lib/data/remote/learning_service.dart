@@ -102,4 +102,34 @@ class LearningService {
       rethrow;
     }
   }
+
+  Future<bool> patchProgress({
+    required String lessonId,
+    required String unitId,
+    required String courseId,
+    required int experiencePoint,
+    required int heartCount,
+  }) async {
+    try {
+      final response = await _apiClient.patch(
+        path: ApiEndpoint.patchProgress,
+        data: {
+          'lessonId': lessonId,
+          'unitId': unitId,
+          'courseId': courseId,
+          'experiencePoint': experiencePoint,
+          'heartCount': heartCount,
+        },
+      );
+      if (response.isSuccess()) {
+        log('patchProgress success');
+        return true;
+      }
+      log('patchProgress fail : ${response.error}');
+      return false;
+    } catch (e) {
+      log('Error patchProgress : $e');
+      rethrow;
+    }
+  }
 }
