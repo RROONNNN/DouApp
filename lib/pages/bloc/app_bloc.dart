@@ -7,6 +7,8 @@ import 'package:injectable/injectable.dart';
 import '../../common/event/event_bus_mixin.dart';
 import 'app_state.dart';
 
+enum ProfileStatus { initial, loading, success, failure }
+
 @Singleton()
 class AppBloc extends Cubit<AppState> with EventBusMixin {
   AppBloc(this.authenticationService) : super(const AppState());

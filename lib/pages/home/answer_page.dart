@@ -3,6 +3,7 @@ import 'package:duo_app/common/enums/request_status.dart';
 import 'package:duo_app/common/resources/app_design_system.dart';
 import 'package:duo_app/di/injection.dart';
 import 'package:duo_app/entities/question.dart';
+import 'package:duo_app/pages/bloc/app_bloc.dart';
 import 'package:duo_app/pages/home/cubit/answer_cubit.dart';
 import 'package:duo_app/pages/home/elements/gap_filling_page.dart';
 import 'package:duo_app/pages/home/elements/matching_page.dart';
@@ -12,8 +13,29 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class AnswerPage extends StatefulWidget {
-  final String lessonId;
-  const AnswerPage({super.key, required this.lessonId});
+  final String? lessonId;
+  final String? courseId;
+  final String? unitId;
+  final int? experiencePoint;
+  final bool isMistake;
+  final List<Question> questions;
+
+  const AnswerPage({
+    super.key,
+    this.lessonId,
+    this.courseId,
+    this.unitId,
+    this.experiencePoint,
+    this.questions = const [],
+    this.isMistake = false,
+  }) : assert(
+         isMistake ||
+             (lessonId != null &&
+                 courseId != null &&
+                 unitId != null &&
+                 experiencePoint != null),
+         'When isMistake is false, lessonId, courseId, unitId, and experiencePoint must not be null.',
+       );
 
   @override
   State<AnswerPage> createState() => _AnswerPageState();
@@ -22,17 +44,29 @@ class AnswerPage extends StatefulWidget {
 class _AnswerPageState extends State<AnswerPage> {
   late final AnswerCubit _answerCubit;
   late final AudioPlayer _audioPlayer;
+  late final _appBloc;
 
   @override
   void initState() {
     super.initState();
-    _answerCubit = getIt<AnswerCubit>()..initialize(widget.lessonId);
+    _appBloc = getIt<AppBloc>();
+    _answerCubit = getIt<AnswerCubit>()
+      ..initialize(
+        widget.lessonId ?? '',
+        widget.courseId ?? '',
+        widget.unitId ?? '',
+        widget.experiencePoint ?? 0,
+        _appBloc.state.user?.heartCount ?? 0,
+        widget.isMistake,
+        widget.questions,
+      );
     _audioPlayer = AudioPlayer();
   }
 
   @override
   void dispose() {
     _audioPlayer.dispose();
+    _appBloc.loadProfile();
     super.dispose();
   }
 
@@ -65,6 +99,53 @@ class _AnswerPageState extends State<AnswerPage> {
       create: (context) => _answerCubit,
       child: BlocBuilder<AnswerCubit, AnswerState>(
         builder: (context, state) {
+          if (state.isHeartCountReached) {
+            return Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.favorite, color: Colors.red, size: 64),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'No hearts left!',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'You\'ve run out of hearts.\nPlease wait until tomorrow to try again.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16, color: Colors.black54),
+                    ),
+                    const SizedBox(height: 32),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.arrow_back),
+                      label: const Text('Back'),
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.redAccent,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 24,
+                        ),
+                        textStyle: const TextStyle(fontSize: 18),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).maybePop();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
           if (state.status == RequestStatus.requesting) {
             return Scaffold(
               body: Container(
@@ -290,17 +371,6 @@ class _AnswerPageState extends State<AnswerPage> {
                               '${state.totalQuestions}',
                               'Questions',
                               AppDesignSystem.primaryGreen,
-                            ),
-                            Container(
-                              width: 1,
-                              height: 40,
-                              color: AppDesignSystem.surfaceLight,
-                            ),
-                            _buildStatItem(
-                              Icons.stars_rounded,
-                              '100%',
-                              'Accuracy',
-                              AppDesignSystem.accentOrange,
                             ),
                           ],
                         ),

@@ -13,7 +13,6 @@ import 'package:injectable/injectable.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   // Load environment variables from .env file
   await dotenv.load(fileName: ".env");
 

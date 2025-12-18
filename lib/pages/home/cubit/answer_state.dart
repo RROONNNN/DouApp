@@ -8,6 +8,7 @@ class AnswerState extends Equatable {
   final int totalQuestions;
   final bool isQuizComplete;
   final int answeredCorrectly;
+  final bool isHeartCountReached;
 
   const AnswerState({
     this.status = RequestStatus.initial,
@@ -17,6 +18,7 @@ class AnswerState extends Equatable {
     this.totalQuestions = 0,
     this.isQuizComplete = false,
     this.answeredCorrectly = 0,
+    this.isHeartCountReached = false,
   });
 
   @override
@@ -28,6 +30,7 @@ class AnswerState extends Equatable {
     totalQuestions,
     isQuizComplete,
     answeredCorrectly,
+    isHeartCountReached,
   ];
 
   AnswerState copyWith({
@@ -38,6 +41,7 @@ class AnswerState extends Equatable {
     int? totalQuestions,
     bool? isQuizComplete,
     int? answeredCorrectly,
+    bool? isHeartCountReached,
   }) {
     return AnswerState(
       status: status ?? this.status,
@@ -47,6 +51,7 @@ class AnswerState extends Equatable {
       totalQuestions: totalQuestions ?? this.totalQuestions,
       isQuizComplete: isQuizComplete ?? this.isQuizComplete,
       answeredCorrectly: answeredCorrectly ?? this.answeredCorrectly,
+      isHeartCountReached: isHeartCountReached ?? this.isHeartCountReached,
     );
   }
 }

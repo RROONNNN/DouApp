@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:duo_app/common/api_client/api_client.dart';
 import 'package:duo_app/data/remote/api_endpoint.dart';
 import 'package:duo_app/entities/course.dart';
+import 'package:duo_app/entities/lesson.dart';
+import 'package:duo_app/entities/progress.dart';
 import 'package:duo_app/entities/question.dart';
 import 'package:duo_app/entities/theory.dart';
 import 'package:duo_app/entities/unit.dart';
@@ -28,6 +30,122 @@ class LearningService {
       return [];
     } catch (e) {
       log('Error getQuestions : $e');
+      rethrow;
+    }
+  }
+
+  Future<Course> getCourseById(String courseId) async {
+    try {
+      final response = await _apiClient.get(
+        path: '${ApiEndpoint.getCourseById}/$courseId',
+      );
+      if (response.isSuccess()) {
+        final value = response.value as Map<String, dynamic>;
+        return Course.fromJson(value);
+      }
+      log('getCourseById fail : ${response.error}');
+      throw Exception('getCourseById fail : ${response.error}');
+    } catch (e) {
+      log('Error getCourseById : $e');
+      rethrow;
+    }
+  }
+
+  // Future<List<Mistake>> getMistakes() async {
+  //   try {
+  //     final response = await _apiClient.get(path: ApiEndpoint.getMistakes);
+  //     if (response.isSuccess()) {
+  //       final value = response.value as Map<String, dynamic>;
+  //       final mistakesJson = value['data'] as List<dynamic>? ?? [];
+  //       return mistakesJson.map((json) => Mistake.fromJson(json)).toList();
+  //     }
+  //   } catch (e) {
+  //     log('Error getMistakes : $e');
+  //     rethrow;
+  //   }
+  // }
+
+  Future<void> addMistake(List<String> lessonIds) async {
+    try {
+      final body = {"wrongAnswer": lessonIds};
+      final response = await _apiClient.post(
+        path: ApiEndpoint.getMistakes,
+        data: body,
+      );
+      if (!response.isSuccess()) {
+        log('addMistake fail : ${response.error}');
+        throw Exception('addMistake fail: ${response.error}');
+      }
+    } catch (e) {
+      log('Error addMistake : $e');
+      rethrow;
+    }
+  }
+
+  Future<void> patchMistakes(List<Map<String, String>> correctAnswers) async {
+    try {
+      final body = {
+        "correctAnswer": correctAnswers
+            .map(
+              (answer) => {
+                "unitId": answer["unitId"],
+                "questionId": answer["questionId"],
+              },
+            )
+            .toList(),
+      };
+      final response = await _apiClient.patch(
+        path: ApiEndpoint.patchMistake,
+        data: body,
+      );
+      if (!response.isSuccess()) {
+        log('patchMistakes fail : ${response.error}');
+        throw Exception('patchMistakes fail: ${response.error}');
+      }
+    } catch (e) {
+      log('Error patchMistakes : $e');
+      rethrow;
+    }
+  }
+
+  Future<List<Map<Unit, List<Question>>>> getMistakes() async {
+    try {
+      final mistakes = <Map<Unit, List<Question>>>[];
+      final response = await _apiClient.get(path: ApiEndpoint.getMistakes);
+      if (response.isSuccess()) {
+        final value = response.value as Map<String, dynamic>;
+        final json = value['data'] as List<dynamic>? ?? [];
+        for (var item in json) {
+          final unit = Unit.fromJson((item['unit'] as List<dynamic>).first);
+          final questions = (item['questions'] as List<dynamic>? ?? [])
+              .map((question) => Question.fromJson(question))
+              .toList();
+          mistakes.add({unit: questions});
+        }
+        return mistakes;
+      }
+      return [];
+    } catch (e) {
+      log('Error getMistakes : $e');
+      rethrow;
+    }
+  }
+
+  Future<Progress?> getProgress() async {
+    try {
+      final response = await _apiClient.get(path: ApiEndpoint.getProgress);
+      if (response.isSuccess()) {
+        if (response.value == null) {
+          return null;
+        }
+        final value = response.value as Map<String, dynamic>;
+        final progressJson = value as Map<String, dynamic>? ?? {};
+        return Progress.fromJson(progressJson);
+      }
+      log('getProgress fail : ${response.error}');
+      return null;
+    } catch (e) {
+      log('Error getProgress : $e');
       rethrow;
     }
   }

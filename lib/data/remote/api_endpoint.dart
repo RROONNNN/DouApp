@@ -16,4 +16,9 @@ class ApiEndpoint {
   static const String getProfile = '/api/auth/profile';
   static const String getQuestions = '/api/questions/user';
   static const String patchProgress = '/api/progress';
+  static const String getProgress = '/api/progress';
+  static const String getCourseById = '/api/courses/';
+  static const String getMistakes = '/api/mistakes';
+  static const String addMistake = '/api/mistakes';
+  static const String patchMistake = '/api/mistakes';
 }

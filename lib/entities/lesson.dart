@@ -7,6 +7,7 @@ class Lesson {
   final String thumbnail;
   final DateTime updatedAt;
   final DateTime createdAt;
+  final int experiencePoint;
 
   Lesson({
     required this.id,
@@ -17,6 +18,7 @@ class Lesson {
     required this.thumbnail,
     required this.updatedAt,
     required this.createdAt,
+    required this.experiencePoint,
   });
 
   factory Lesson.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class Lesson {
       thumbnail: json['thumbnail'] as String,
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       createdAt: DateTime.parse(json['createdAt'] as String),
+      experiencePoint: json['experiencePoint'] as int,
     );
   }
 
@@ -42,6 +45,7 @@ class Lesson {
       'thumbnail': thumbnail,
       'updatedAt': updatedAt.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
+      'experiencePoint': experiencePoint,
     };
   }
 }

@@ -8,36 +8,60 @@ import 'package:injectable/injectable.dart';
 
 part 'home_state.dart';
 
-@injectable
+@singleton
 class HomeCubit extends Cubit<HomeState> {
   HomeCubit({required this.learningService}) : super(const HomeState());
   final LearningService learningService;
   Future<void> initialize() async {
     try {
       if (isClosed) return;
-      emit(const HomeState(status: RequestStatus.requesting));
-      final courses = await learningService.getCourses();
-      if (isClosed) return;
-      if (courses.isNotEmpty) {
-        final selectedCourse = courses.first;
-        final units = await learningService.getUnitsByCourseId(
-          selectedCourse.id,
-        );
-        if (isClosed) return;
-        emit(
-          HomeState(
-            status: RequestStatus.success,
-            selectedCourse: selectedCourse,
-            courses: courses,
-            units: units,
-          ),
-        );
+      emit(state.copyWith(status: RequestStatus.requesting));
+      final progress = await learningService.getProgress();
+      late final Course currentCourse;
+      List<Course> courses = [];
+      if (progress != null) {
+        final courseId = progress.course;
+        currentCourse = await learningService.getCourseById(courseId);
+        final units = await learningService.getUnitsByCourseId(courseId);
+        if (units.isNotEmpty) {
+          final selectedUnit = units.first;
+          final lessons = await learningService.getTheoriesByUnitId(
+            selectedUnit.id,
+          );
+        }
       } else {
-        emit(const HomeState(status: RequestStatus.success));
+        courses = await learningService.getCourses();
+        if (courses.isNotEmpty) {
+          currentCourse = courses.first;
+        }
+        if (isClosed) return;
       }
+      final units = await learningService.getUnitsByCourseId(currentCourse.id);
+      if (isClosed) return;
+      emit(
+        state.copyWith(
+          status: RequestStatus.success,
+          selectedCourse: currentCourse,
+          courses: courses,
+          units: units,
+        ),
+      );
     } catch (e) {
       if (isClosed) return;
-      emit(const HomeState(status: RequestStatus.failed));
+      emit(state.copyWith(status: RequestStatus.failed));
+    }
+  }
+
+  Future<void> loadCourses() async {
+    try {
+      emit(state.copyWith(coursesStatus: RequestStatus.requesting));
+      final courses = await learningService.getCourses();
+
+      emit(
+        state.copyWith(coursesStatus: RequestStatus.success, courses: courses),
+      );
+    } catch (e) {
+      emit(state.copyWith(coursesStatus: RequestStatus.failed));
     }
   }
 }

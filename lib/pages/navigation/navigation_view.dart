@@ -20,10 +20,10 @@ class _NavigationPageState extends State<NavigationPage> {
 
   final List<Widget> _pages = [
     const HomePage(),
-    const LeaderboardPage(),
+
     const MistakesPage(),
-    const KnowledgePage(),
-    ProfilePage(),
+
+    const ProfilePage(),
   ];
 
   @override
@@ -53,14 +53,14 @@ class _NavigationPageState extends State<NavigationPage> {
               ),
               label: 'Home',
             ),
-            NavigationDestination(
-              icon: Image.asset(
-                Assets.navigationIcons.navGraph.path,
-                width: 24,
-                height: 24,
-              ),
-              label: 'Leaderboard',
-            ),
+            // NavigationDestination(
+            //   icon: Image.asset(
+            //     Assets.navigationIcons.navGraph.path,
+            //     width: 24,
+            //     height: 24,
+            //   ),
+            //   label: 'Leaderboard',
+            // ),
             NavigationDestination(
               icon: Image.asset(
                 Assets.navigationIcons.navRemove.path,
@@ -69,14 +69,14 @@ class _NavigationPageState extends State<NavigationPage> {
               ),
               label: 'Mistakes',
             ),
-            NavigationDestination(
-              icon: Image.asset(
-                Assets.navigationIcons.navInfo.path,
-                width: 24,
-                height: 24,
-              ),
-              label: 'Knowledge',
-            ),
+            // NavigationDestination(
+            //   icon: Image.asset(
+            //     Assets.navigationIcons.navInfo.path,
+            //     width: 24,
+            //     height: 24,
+            //   ),
+            //   label: 'Knowledge',
+            // ),
             NavigationDestination(
               icon: Image.asset(
                 Assets.navigationIcons.navUser.path,
