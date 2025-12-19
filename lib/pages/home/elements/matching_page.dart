@@ -246,7 +246,7 @@ class _MatchingPageState extends State<MatchingPage>
                         value: value,
                         backgroundColor: AppDesignSystem.surfaceGrey,
                         valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppDesignSystem.primaryGreen,
+                          Color(0xFF1976D2),
                         ),
                       );
                     },
@@ -329,7 +329,9 @@ class _MatchingPageState extends State<MatchingPage>
                           height: 56,
                           child: Container(
                             decoration: BoxDecoration(
-                              gradient: AppDesignSystem.successGradient,
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
+                              ),
                               borderRadius: BorderRadius.circular(
                                 AppDesignSystem.radiusMedium,
                               ),

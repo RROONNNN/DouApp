@@ -13,7 +13,7 @@ enum ProfileStatus { initial, loading, success, failure }
 class AppBloc extends Cubit<AppState> with EventBusMixin {
   AppBloc(this.authenticationService) : super(const AppState());
   final AuthenticationService authenticationService;
-  void loadProfile() async {
+  Future<void> loadProfile() async {
     emit(state.copyWith(status: ProfileStatus.loading));
     try {
       final result = await authenticationService.getProfile();

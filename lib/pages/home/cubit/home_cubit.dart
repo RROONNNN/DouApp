@@ -54,14 +54,37 @@ class HomeCubit extends Cubit<HomeState> {
 
   Future<void> loadCourses() async {
     try {
+      if (isClosed) return;
       emit(state.copyWith(coursesStatus: RequestStatus.requesting));
       final courses = await learningService.getCourses();
 
+      if (isClosed) return;
       emit(
         state.copyWith(coursesStatus: RequestStatus.success, courses: courses),
       );
     } catch (e) {
+      if (isClosed) return;
       emit(state.copyWith(coursesStatus: RequestStatus.failed));
+    }
+  }
+
+  Future<void> selectCourse(String courseId) async {
+    try {
+      if (isClosed) return;
+      emit(state.copyWith(status: RequestStatus.requesting));
+      final course = await learningService.getCourseById(courseId);
+      final units = await learningService.getUnitsByCourseId(courseId);
+      if (isClosed) return;
+      emit(
+        state.copyWith(
+          status: RequestStatus.success,
+          selectedCourse: course,
+          units: units,
+        ),
+      );
+    } catch (e) {
+      if (isClosed) return;
+      emit(state.copyWith(status: RequestStatus.failed));
     }
   }
 }

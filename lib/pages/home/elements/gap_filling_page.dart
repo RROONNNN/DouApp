@@ -225,8 +225,12 @@ class _GapFillingPageState extends State<GapFillingPage>
               padding: const EdgeInsets.all(AppDesignSystem.spacing32),
               decoration: BoxDecoration(
                 gradient: _isPlaying
-                    ? AppDesignSystem.blueGradient
-                    : AppDesignSystem.greenGradient,
+                    ? const LinearGradient(
+                        colors: [Color(0xFF1E88E5), Color(0xFF42A5F5)],
+                      )
+                    : const LinearGradient(
+                        colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
+                      ),
                 borderRadius: BorderRadius.circular(
                   AppDesignSystem.radiusXLarge,
                 ),
@@ -234,8 +238,8 @@ class _GapFillingPageState extends State<GapFillingPage>
                   BoxShadow(
                     color:
                         (_isPlaying
-                                ? AppDesignSystem.secondaryBlue
-                                : AppDesignSystem.primaryGreen)
+                                ? const Color(0xFF1976D2)
+                                : const Color(0xFF0D47A1))
                             .withOpacity(0.3),
                     blurRadius: 24,
                     offset: const Offset(0, 8),
@@ -482,7 +486,9 @@ class _GapFillingPageState extends State<GapFillingPage>
                 height: 56,
                 child: Container(
                   decoration: BoxDecoration(
-                    gradient: AppDesignSystem.successGradient,
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
+                    ),
                     borderRadius: BorderRadius.circular(
                       AppDesignSystem.radiusMedium,
                     ),
@@ -539,7 +545,9 @@ class _GapFillingPageState extends State<GapFillingPage>
               decoration: BoxDecoration(
                 gradient: _textController.text.trim().isEmpty
                     ? null
-                    : AppDesignSystem.successGradient,
+                    : const LinearGradient(
+                        colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
+                      ),
                 color: _textController.text.trim().isEmpty
                     ? AppDesignSystem.surfaceGrey
                     : null,

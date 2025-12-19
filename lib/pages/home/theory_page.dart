@@ -99,8 +99,14 @@ class _TheoryPageState extends State<TheoryPage> {
         title: const Text('Theory'),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: AppColors.primaryColor,
-        foregroundColor: AppColors.white,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1E88E5), Color(0xFF42A5F5)],
+            ),
+          ),
+        ),
+        foregroundColor: Colors.white,
       ),
       body: FutureBuilder<List<Theory>>(
         future: _theoriesFuture, // Use cached future - no more repeated calls!
@@ -214,7 +220,7 @@ class _TheoryPageState extends State<TheoryPage> {
             icon: Icon(
               Icons.arrow_back_ios,
               color: _currentPage > 0
-                  ? AppColors.primaryColor
+                  ? const Color(0xFF1976D2)
                   : AppColors.gray200,
             ),
           ),
@@ -229,7 +235,7 @@ class _TheoryPageState extends State<TheoryPage> {
               width: _currentPage == index ? 24 : 8,
               decoration: BoxDecoration(
                 color: _currentPage == index
-                    ? AppColors.primaryColor
+                    ? const Color(0xFF1976D2)
                     : AppColors.gray200,
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -249,7 +255,7 @@ class _TheoryPageState extends State<TheoryPage> {
             icon: Icon(
               Icons.arrow_forward_ios,
               color: _currentPage < _theories.length - 1
-                  ? AppColors.primaryColor
+                  ? const Color(0xFF1976D2)
                   : AppColors.gray200,
             ),
           ),
@@ -551,7 +557,7 @@ class _TheoryPageState extends State<TheoryPage> {
           title,
           style: TextStyles.blackNormalBold.copyWith(
             fontSize: 18,
-            color: AppColors.primaryColor,
+            color: const Color(0xFF1976D2),
           ),
         ),
       ],
@@ -594,7 +600,7 @@ class _TheoryPageState extends State<TheoryPage> {
                   child: const Center(
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: AppColors.primaryColor,
+                      color: Color(0xFF1976D2),
                     ),
                   ),
                 ),
@@ -619,7 +625,7 @@ class _TheoryPageState extends State<TheoryPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColors.primaryColor.withOpacity(0.1),
+              color: const Color(0xFF1976D2).withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: TapLottieWidget(
@@ -665,7 +671,7 @@ class _TheoryPageState extends State<TheoryPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: AppColors.primaryColor.withOpacity(0.1),
+                color: const Color(0xFF1976D2).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(

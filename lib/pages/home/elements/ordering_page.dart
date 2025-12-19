@@ -8,10 +8,13 @@ class OrderingPage extends StatefulWidget {
 
   final VoidCallback onComplete;
 
+  final VoidCallback onWrong;
+
   const OrderingPage({
     super.key,
     required this.question,
     required this.onComplete,
+    required this.onWrong,
   });
 
   @override
@@ -30,6 +33,10 @@ class _OrderingPageState extends State<OrderingPage> {
   int? _pendingWordIndex;
 
   final Map<int, GlobalKey> _itemKeys = {};
+
+  // State for answer checking
+  bool _hasSubmitted = false;
+  bool _isCorrect = false;
 
   @override
   void initState() {
@@ -125,6 +132,33 @@ class _OrderingPageState extends State<OrderingPage> {
     });
   }
 
+  void _checkAnswer() {
+    // Build the user's answer from selected words
+    final userAnswer = selectedIndexes
+        .map((index) => wordBank[index])
+        .join(' ');
+
+    // Compare with correct answer
+    final correctAnswer = widget.question.correctAnswer ?? '';
+
+    setState(() {
+      _hasSubmitted = true;
+      _isCorrect =
+          userAnswer.trim().toLowerCase() == correctAnswer.trim().toLowerCase();
+    });
+
+    // Call appropriate callback after a short delay
+    if (_isCorrect) {
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) {
+          widget.onComplete();
+        }
+      });
+    } else {
+      widget.onWrong();
+    }
+  }
+
   Widget buildWordTile(int index, {bool isForTarget = false}) {
     final isGhost = !isForTarget ? selectedIndexes.contains(index) : false;
     return Container(
@@ -184,7 +218,9 @@ class _OrderingPageState extends State<OrderingPage> {
                 Container(
                   padding: const EdgeInsets.all(AppDesignSystem.spacing12),
                   decoration: BoxDecoration(
-                    gradient: AppDesignSystem.purpleGradient,
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF1E88E5), Color(0xFF42A5F5)],
+                    ),
                     borderRadius: BorderRadius.circular(
                       AppDesignSystem.radiusMedium,
                     ),
@@ -229,12 +265,12 @@ class _OrderingPageState extends State<OrderingPage> {
               color: AppDesignSystem.surfaceWhite,
               borderRadius: BorderRadius.circular(AppDesignSystem.radiusLarge),
               border: Border.all(
-                color: AppDesignSystem.primaryGreenLight.withOpacity(0.3),
+                color: const Color(0xFF1976D2).withOpacity(0.3),
                 width: 2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppDesignSystem.primaryGreenLight.withOpacity(0.1),
+                  color: const Color(0xFF1976D2).withOpacity(0.1),
                   blurRadius: 20,
                   offset: const Offset(0, 4),
                 ),
@@ -283,10 +319,12 @@ class _OrderingPageState extends State<OrderingPage> {
                               scale: 0.8 + (value * 0.2),
                               child: GestureDetector(
                                 onTap: () {
-                                  _itemKeys.remove(index);
-                                  setState(() {
-                                    selectedIndexes.removeAt(index);
-                                  });
+                                  if (!_hasSubmitted) {
+                                    _itemKeys.remove(index);
+                                    setState(() {
+                                      selectedIndexes.removeAt(index);
+                                    });
+                                  }
                                 },
                                 child: buildWordTile(
                                   wordIndex,
@@ -322,10 +360,14 @@ class _OrderingPageState extends State<OrderingPage> {
                       scale: value,
                       child: GestureDetector(
                         onTapDown: (details) {
-                          wordPositions[index] = details.globalPosition;
+                          if (!_hasSubmitted) {
+                            wordPositions[index] = details.globalPosition;
+                          }
                         },
                         onTap: () {
-                          triggerFlyAnimation(context, index);
+                          if (!_hasSubmitted) {
+                            triggerFlyAnimation(context, index);
+                          }
                         },
                         child: buildWordTile(index),
                       ),
@@ -335,6 +377,87 @@ class _OrderingPageState extends State<OrderingPage> {
               }),
             ),
           ),
+
+          // Result feedback
+          if (_hasSubmitted)
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDesignSystem.spacing20,
+                vertical: AppDesignSystem.spacing16,
+              ),
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.elasticOut,
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: value,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppDesignSystem.spacing20,
+                        vertical: AppDesignSystem.spacing16,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _isCorrect
+                            ? AppDesignSystem.successGreen.withOpacity(0.1)
+                            : AppDesignSystem.errorRed.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(
+                          AppDesignSystem.radiusMedium,
+                        ),
+                        border: Border.all(
+                          color: _isCorrect
+                              ? AppDesignSystem.successGreen
+                              : AppDesignSystem.errorRed,
+                          width: 2,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            _isCorrect
+                                ? Icons.check_circle_rounded
+                                : Icons.cancel_rounded,
+                            color: _isCorrect
+                                ? AppDesignSystem.successGreen
+                                : AppDesignSystem.errorRed,
+                            size: 28,
+                          ),
+                          const SizedBox(width: AppDesignSystem.spacing12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _isCorrect ? 'Perfect!' : 'Incorrect',
+                                  style: AppDesignSystem.titleMedium.copyWith(
+                                    color: _isCorrect
+                                        ? AppDesignSystem.successGreen
+                                        : AppDesignSystem.errorRed,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                if (!_isCorrect) ...[
+                                  const SizedBox(
+                                    height: AppDesignSystem.spacing4,
+                                  ),
+                                  Text(
+                                    'Correct answer: ${widget.question.correctAnswer}',
+                                    style: AppDesignSystem.bodyMedium.copyWith(
+                                      color: AppDesignSystem.errorRed,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
 
           const Spacer(),
 
@@ -354,14 +477,16 @@ class _OrderingPageState extends State<OrderingPage> {
                       height: 56,
                       child: Container(
                         decoration: BoxDecoration(
-                          gradient: AppDesignSystem.successGradient,
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
+                          ),
                           borderRadius: BorderRadius.circular(
                             AppDesignSystem.radiusMedium,
                           ),
                           boxShadow: AppDesignSystem.shadowHigh,
                         ),
                         child: ElevatedButton(
-                          onPressed: widget.onComplete,
+                          onPressed: _hasSubmitted ? null : _checkAnswer,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
                             shadowColor: Colors.transparent,

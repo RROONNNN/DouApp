@@ -19,38 +19,48 @@ class AnimatedButton extends StatefulWidget {
 }
 
 class _AnimatedButtonState extends State<AnimatedButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+    with TickerProviderStateMixin {
+  late AnimationController _scaleController;
+  late AnimationController _glowController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _curveAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+
+    // Scale animation
+    _scaleController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 150),
     );
     _curveAnimation = CurvedAnimation(
-      parent: _controller,
+      parent: _scaleController,
       curve: Curves.easeInOut,
     );
     _scaleAnimation = Tween<double>(
       begin: 1.0,
       end: 0.85,
     ).animate(_curveAnimation);
+
+    // Glow animation
+    _glowController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _scaleController.dispose();
+    _glowController.dispose();
     super.dispose();
   }
 
   Future<void> _handleTap() async {
-    await _controller.forward();
+    await _scaleController.forward();
     widget.onTap();
-    await _controller.reverse();
+    await _scaleController.reverse();
   }
 
   @override
@@ -58,15 +68,29 @@ class _AnimatedButtonState extends State<AnimatedButton>
     return GestureDetector(
       onTap: _handleTap,
       child: AnimatedBuilder(
-        animation: _scaleAnimation,
-        builder: (context, child) => Transform.scale(
-          scale: _scaleAnimation.value,
-          child: SizedBox(
-            width: widget.width,
-            height: widget.height,
-            child: widget.child,
-          ),
-        ),
+        animation: Listenable.merge([_scaleAnimation, _glowController]),
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: Container(
+              width: widget.width,
+              height: widget.height,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(
+                      0xFF1976D2,
+                    ).withOpacity(0.2 + (_glowController.value * 0.2)),
+                    blurRadius: 12 + (_glowController.value * 8),
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: widget.child,
+            ),
+          );
+        },
       ),
     );
   }

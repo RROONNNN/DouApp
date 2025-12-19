@@ -65,9 +65,9 @@ class LearningService {
   //   }
   // }
 
-  Future<void> addMistake(List<String> lessonIds) async {
+  Future<void> addMistake(List<String> questionId) async {
     try {
-      final body = {"wrongAnswer": lessonIds};
+      final body = {"wrongAnswer": questionId};
       final response = await _apiClient.post(
         path: ApiEndpoint.getMistakes,
         data: body,

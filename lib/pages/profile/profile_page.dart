@@ -6,22 +6,61 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage>
+    with TickerProviderStateMixin {
+  late AnimationController _glowController;
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Glow animation for avatar
+    _glowController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    // Fade animation for content
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeIn,
+    );
+
+    _fadeController.forward();
+  }
+
+  @override
+  void dispose() {
+    _glowController.dispose();
+    _fadeController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text('Profile'),
-        elevation: 0,
-        centerTitle: true,
-      ),
+      backgroundColor: const Color(0xFFF5F9FF),
       body: BlocBuilder<AppBloc, AppState>(
         builder: (context, state) {
           if (state.status == ProfileStatus.loading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1976D2)),
+              ),
+            );
           }
 
           if (state.status == ProfileStatus.failure) {
@@ -29,7 +68,18 @@ class ProfilePage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Colors.red[400],
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'Failed to load profile',
@@ -39,12 +89,22 @@ class ProfilePage extends StatelessWidget {
                       color: Colors.grey[800],
                     ),
                   ),
-
                   const SizedBox(height: 24),
                   ElevatedButton.icon(
                     onPressed: () {
                       context.read<AppBloc>().loadProfile();
                     },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1976D2),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                     icon: const Icon(Icons.refresh),
                     label: const Text('Retry'),
                   ),
@@ -68,43 +128,56 @@ class ProfilePage extends StatelessWidget {
       onRefresh: () async {
         context.read<AppBloc>().loadProfile();
       },
+      color: const Color(0xFF1976D2),
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: Column(
           children: [
-            // Profile Header with gradient background
+            // Profile Header with blue gradient
             _buildProfileHeader(context, user),
 
             const SizedBox(height: 20),
 
             // Stats Grid
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _buildStatsGrid(context, user),
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _buildStatsGrid(context, user),
+              ),
             ),
 
             const SizedBox(height: 20),
 
             // Activity Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _buildActivitySection(context, user),
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _buildActivitySection(context, user),
+              ),
             ),
 
             const SizedBox(height: 20),
 
             // Account Information Card
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _buildAccountInfoCard(context, user),
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _buildAccountInfoCard(context, user),
+              ),
             ),
 
             const SizedBox(height: 20),
 
             // Logout Button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _buildLogoutButton(context),
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _buildLogoutButton(context),
+              ),
             ),
 
             const SizedBox(height: 32),
@@ -117,56 +190,72 @@ class ProfilePage extends StatelessWidget {
   Widget _buildProfileHeader(BuildContext context, User user) {
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Theme.of(context).primaryColor,
-            Theme.of(context).primaryColor.withOpacity(0.8),
-          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF1E88E5), // Blue 600
+            Color(0xFF42A5F5), // Blue 400
+          ],
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
         ),
       ),
       child: SafeArea(
         bottom: false,
         child: Column(
           children: [
-            const SizedBox(height: 20),
-            // Avatar
-            Container(
-              width: 110,
-              height: 110,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 4),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: CircleAvatar(
-                radius: 53,
-                backgroundColor: Colors.white,
-                backgroundImage: user.avatarImage != null
-                    ? NetworkImage(user.avatarImage!)
-                    : null,
-                child: user.avatarImage == null
-                    ? Text(
-                        _getInitials(user.fullName),
-                        style: TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).primaryColor,
+            const SizedBox(height: 32),
+            // Animated Avatar with glow
+            AnimatedBuilder(
+              animation: _glowController,
+              builder: (context, child) {
+                return Container(
+                  width: 130,
+                  height: 130,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.white.withOpacity(
+                          0.3 + (_glowController.value * 0.3),
                         ),
-                      )
-                    : null,
-              ),
+                        blurRadius: 20 + (_glowController.value * 20),
+                        spreadRadius: 5,
+                      ),
+                    ],
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 4),
+                    ),
+                    child: CircleAvatar(
+                      radius: 63,
+                      backgroundColor: Colors.white,
+                      backgroundImage: user.avatarImage != null
+                          ? NetworkImage(user.avatarImage!)
+                          : null,
+                      child: user.avatarImage == null
+                          ? Text(
+                              _getInitials(user.fullName),
+                              style: const TextStyle(
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1976D2),
+                              ),
+                            )
+                          : null,
+                    ),
+                  ),
+                );
+              },
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
             // Full Name
             Text(
@@ -179,13 +268,13 @@ class ProfilePage extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
 
             // Email
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withOpacity(0.25),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -196,7 +285,7 @@ class ProfilePage extends StatelessWidget {
                     size: 16,
                     color: Colors.white,
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: 8),
                   Text(
                     user.email,
                     style: const TextStyle(fontSize: 14, color: Colors.white),
@@ -205,7 +294,7 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
 
             // Status Badge
             _buildBadge(
@@ -214,7 +303,7 @@ class ProfilePage extends StatelessWidget {
               user.isActive ? Icons.check_circle : Icons.cancel,
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
           ],
         ),
       ),
@@ -225,35 +314,59 @@ class ProfilePage extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: _buildStatCard(
-            context,
-            icon: Icons.local_fire_department,
-            iconColor: Colors.orange,
-            value: '${user.streakCount}',
-            label: 'Day Streak',
-            backgroundColor: Colors.orange.shade50,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeOut,
+            builder: (context, value, child) {
+              return Transform.scale(scale: value, child: child);
+            },
+            child: _buildStatCard(
+              context,
+              icon: Icons.local_fire_department,
+              iconColor: const Color(0xFFFF6F00),
+              value: '${user.streakCount}',
+              label: 'Day Streak',
+              backgroundColor: const Color(0xFFFFF3E0),
+            ),
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: _buildStatCard(
-            context,
-            icon: Icons.star,
-            iconColor: Colors.amber,
-            value: '${user.experiencePoint}',
-            label: 'XP',
-            backgroundColor: Colors.amber.shade50,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 600),
+            curve: Curves.easeOut,
+            builder: (context, value, child) {
+              return Transform.scale(scale: value, child: child);
+            },
+            child: _buildStatCard(
+              context,
+              icon: Icons.star,
+              iconColor: const Color(0xFFFFA000),
+              value: '${user.experiencePoint}',
+              label: 'XP',
+              backgroundColor: const Color(0xFFFFF8E1),
+            ),
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: _buildStatCard(
-            context,
-            icon: Icons.favorite,
-            iconColor: Colors.red,
-            value: '${user.heartCount}',
-            label: 'Hearts',
-            backgroundColor: Colors.red.shade50,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 700),
+            curve: Curves.easeOut,
+            builder: (context, value, child) {
+              return Transform.scale(scale: value, child: child);
+            },
+            child: _buildStatCard(
+              context,
+              icon: Icons.favorite,
+              iconColor: const Color(0xFFE53935),
+              value: '${user.heartCount}',
+              label: 'Hearts',
+              backgroundColor: const Color(0xFFFFEBEE),
+            ),
           ),
         ),
       ],
@@ -323,8 +436,19 @@ class ProfilePage extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.trending_up, color: Theme.of(context).primaryColor),
-                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1976D2).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.trending_up,
+                    color: Color(0xFF1976D2),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
                 const Text(
                   'Activity',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -336,14 +460,14 @@ class ProfilePage extends StatelessWidget {
               icon: Icons.access_time_outlined,
               label: 'Last Active',
               value: _formatDateTime(user.lastActiveAt),
-              color: Colors.blue,
+              color: const Color(0xFF1976D2),
             ),
             const SizedBox(height: 16),
             _buildActivityItem(
               icon: Icons.update_outlined,
               label: 'Profile Updated',
               value: _formatDateTime(user.updatedAt),
-              color: Colors.purple,
+              color: const Color(0xFF42A5F5),
             ),
           ],
         ),
@@ -408,8 +532,19 @@ class ProfilePage extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.info_outline, color: Theme.of(context).primaryColor),
-                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1976D2).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.info_outline,
+                    color: Color(0xFF1976D2),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
                 const Text(
                   'Account Information',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),

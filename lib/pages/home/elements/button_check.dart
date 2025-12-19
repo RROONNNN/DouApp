@@ -1,4 +1,3 @@
-import 'package:duo_app/common/resources/app_design_system.dart';
 import 'package:flutter/material.dart';
 
 class ButtonCheck extends StatefulWidget {
@@ -27,7 +26,7 @@ class _ButtonCheckState extends State<ButtonCheck>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: AppDesignSystem.animationFast,
+      duration: const Duration(milliseconds: 150),
     );
   }
 
@@ -40,7 +39,7 @@ class _ButtonCheckState extends State<ButtonCheck>
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(AppDesignSystem.spacing20),
+      padding: const EdgeInsets.all(20),
       child: TweenAnimationBuilder<double>(
         tween: Tween(begin: 0.0, end: 1.0),
         duration: const Duration(milliseconds: 400),
@@ -63,7 +62,7 @@ class _ButtonCheckState extends State<ButtonCheck>
                         setState(() => _isPressed = false);
                         _controller.reverse();
                         Future.delayed(
-                          AppDesignSystem.animationFast,
+                          const Duration(milliseconds: 150),
                           widget.onPressed,
                         );
                       }
@@ -82,18 +81,25 @@ class _ButtonCheckState extends State<ButtonCheck>
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: widget.isEnabled
-                              ? AppDesignSystem.successGradient
+                              ? const LinearGradient(
+                                  colors: [
+                                    Color(0xFF0D47A1), // Dark Blue
+                                    Color(0xFF1976D2), // Primary Blue
+                                  ],
+                                )
                               : null,
-                          color: widget.isEnabled
-                              ? null
-                              : AppDesignSystem.surfaceGrey,
-                          borderRadius: BorderRadius.circular(
-                            AppDesignSystem.radiusMedium,
-                          ),
+                          color: widget.isEnabled ? null : Colors.grey[300],
+                          borderRadius: BorderRadius.circular(12),
                           boxShadow: widget.isEnabled
-                              ? (_isPressed
-                                    ? AppDesignSystem.shadowLow
-                                    : AppDesignSystem.shadowHigh)
+                              ? [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFF0D47A1,
+                                    ).withOpacity(_isPressed ? 0.2 : 0.4),
+                                    blurRadius: _isPressed ? 8 : 15,
+                                    offset: Offset(0, _isPressed ? 2 : 8),
+                                  ),
+                                ]
                               : null,
                         ),
                         child: Center(
@@ -104,15 +110,16 @@ class _ButtonCheckState extends State<ButtonCheck>
                                 Icons.check_circle_rounded,
                                 color: widget.isEnabled
                                     ? Colors.white
-                                    : AppDesignSystem.textTertiary,
+                                    : Colors.grey[600],
                               ),
-                              const SizedBox(width: AppDesignSystem.spacing12),
+                              const SizedBox(width: 12),
                               Text(
                                 widget.text,
-                                style: AppDesignSystem.titleLarge.copyWith(
+                                style: TextStyle(
+                                  fontSize: 18,
                                   color: widget.isEnabled
                                       ? Colors.white
-                                      : AppDesignSystem.textTertiary,
+                                      : Colors.grey[600],
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 1.0,
                                 ),

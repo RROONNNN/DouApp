@@ -70,17 +70,17 @@ class AnswerCubit extends Cubit<AnswerState> {
 
       final questions = await learningService.getQuestions(lessonId);
       // for test : filter all questions to only have ordering questions
-      final orderingQuestions = questions
-          .where(
-            (question) => question.typeQuestion == TypeQuestion.multipleChoice,
-          )
-          .toList();
-      _questions = Queue.from(orderingQuestions);
+      // final orderingQuestions = questions
+      //     .where(
+      //       (question) => question.typeQuestion == TypeQuestion.multipleChoice,
+      //     )
+      //     .toList();
+      _questions = Queue.from(questions);
       emit(
         state.copyWith(
           status: RequestStatus.success,
-          questions: orderingQuestions,
-          totalQuestions: orderingQuestions.length,
+          questions: questions,
+          totalQuestions: questions.length,
           currentQuestion: _questions.first,
         ),
       );
@@ -137,6 +137,7 @@ class AnswerCubit extends Cubit<AnswerState> {
   Future<void> answerIncorrectly(String questionId) async {
     if (!isMistake) {
       heartCount -= 1;
+      learningService.addMistake([questionId]);
       if (heartCount <= 0) {
         await learningService.patchProgress(
           lessonId: state.currentQuestion?.lessonId ?? '',
@@ -145,7 +146,6 @@ class AnswerCubit extends Cubit<AnswerState> {
           experiencePoint: 10,
           heartCount: 0,
         );
-
         emit(state.copyWith(isHeartCountReached: true));
 
         return;

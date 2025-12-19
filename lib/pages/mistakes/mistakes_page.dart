@@ -1,5 +1,4 @@
 import 'package:duo_app/common/enums/request_status.dart';
-import 'package:duo_app/common/resources/app_design_system.dart';
 import 'package:duo_app/di/injection.dart';
 import 'package:duo_app/entities/question.dart';
 import 'package:duo_app/entities/unit.dart';
@@ -56,8 +55,8 @@ class _MistakesPageState extends State<MistakesPage> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                AppDesignSystem.surfaceLight,
-                AppDesignSystem.surfaceWhite,
+                Color(0xFFF5F9FF), // Very light blue
+                Colors.white,
               ],
             ),
           ),
@@ -72,8 +71,8 @@ class _MistakesPageState extends State<MistakesPage> {
                         onRefresh: () async {
                           await _bloc.getMistakes();
                         },
-                        color: AppDesignSystem.primaryGreen,
-                        backgroundColor: AppDesignSystem.surfaceWhite,
+                        color: const Color(0xFF1976D2),
+                        backgroundColor: Colors.white,
                         child: Builder(
                           builder: (context) {
                             if (state.status == RequestStatus.requesting) {
@@ -105,26 +104,35 @@ class _MistakesPageState extends State<MistakesPage> {
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.all(AppDesignSystem.spacing20),
-      decoration: BoxDecoration(
-        color: AppDesignSystem.surfaceWhite,
-        boxShadow: AppDesignSystem.shadowLow,
+      padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF1E88E5), // Blue 600
+            Color(0xFF42A5F5), // Blue 400
+          ],
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(24),
+          bottomRight: Radius.circular(24),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x331976D2),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(AppDesignSystem.spacing12),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppDesignSystem.errorRed,
-                  AppDesignSystem.errorRed.withOpacity(0.8),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(AppDesignSystem.radiusMedium),
-              boxShadow: AppDesignSystem.shadowMedium,
+              color: Colors.white.withOpacity(0.25),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
               Icons.error_outline_rounded,
@@ -132,16 +140,23 @@ class _MistakesPageState extends State<MistakesPage> {
               size: 28,
             ),
           ),
-          const SizedBox(width: AppDesignSystem.spacing16),
-          Expanded(
+          const SizedBox(width: 16),
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Review Mistakes', style: AppDesignSystem.headlineMedium),
-                const SizedBox(height: 2),
+                Text(
+                  'Review Mistakes',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 2),
                 Text(
                   'Practice questions you got wrong',
-                  style: AppDesignSystem.bodyMedium,
+                  style: TextStyle(fontSize: 14, color: Colors.white),
                 ),
               ],
             ),
@@ -153,7 +168,7 @@ class _MistakesPageState extends State<MistakesPage> {
 
   Widget _buildMistakesList(MistakeState state) {
     return ListView.builder(
-      padding: const EdgeInsets.all(AppDesignSystem.spacing16),
+      padding: const EdgeInsets.all(16),
       itemCount: state.mistakes.length,
       itemBuilder: (context, index) {
         final mistakeMap = state.mistakes[index];
@@ -180,17 +195,25 @@ class _MistakesPageState extends State<MistakesPage> {
         );
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: AppDesignSystem.spacing16),
-        decoration: AppDesignSystem.cardDecoration(
-          shadows: AppDesignSystem.shadowMedium,
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
             onTap: () => _navigateToMistakeQuiz(unit, questions),
-            borderRadius: BorderRadius.circular(AppDesignSystem.radiusMedium),
+            borderRadius: BorderRadius.circular(16),
             child: Padding(
-              padding: const EdgeInsets.all(AppDesignSystem.spacing16),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   // Unit Icon
@@ -198,29 +221,25 @@ class _MistakesPageState extends State<MistakesPage> {
                     width: 60,
                     height: 60,
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
+                      gradient: const LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [
-                          AppDesignSystem.warningOrange.withOpacity(0.8),
-                          AppDesignSystem.warningOrange,
-                        ],
+                        colors: [Color(0xFF1E88E5), Color(0xFF42A5F5)],
                       ),
-                      borderRadius: BorderRadius.circular(
-                        AppDesignSystem.radiusMedium,
-                      ),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
                       child: Text(
                         '${questions.length}',
-                        style: AppDesignSystem.headlineMedium.copyWith(
+                        style: const TextStyle(
                           color: Colors.white,
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: AppDesignSystem.spacing16),
+                  const SizedBox(width: 16),
 
                   // Unit Info
                   Expanded(
@@ -229,25 +248,27 @@ class _MistakesPageState extends State<MistakesPage> {
                       children: [
                         Text(
                           unit.title,
-                          style: AppDesignSystem.titleLarge.copyWith(
+                          style: const TextStyle(
+                            fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: AppDesignSystem.spacing4),
+                        const SizedBox(height: 4),
                         Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.quiz_outlined,
                               size: 16,
-                              color: AppDesignSystem.textSecondary,
+                              color: Colors.grey,
                             ),
-                            const SizedBox(width: AppDesignSystem.spacing4),
+                            const SizedBox(width: 4),
                             Text(
                               '${questions.length} question${questions.length > 1 ? 's' : ''} to review',
-                              style: AppDesignSystem.bodyMedium.copyWith(
-                                color: AppDesignSystem.textSecondary,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
                               ),
                             ),
                           ],
@@ -258,16 +279,14 @@ class _MistakesPageState extends State<MistakesPage> {
 
                   // Arrow Icon
                   Container(
-                    padding: const EdgeInsets.all(AppDesignSystem.spacing8),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppDesignSystem.surfaceLight,
-                      borderRadius: BorderRadius.circular(
-                        AppDesignSystem.radiusSmall,
-                      ),
+                      color: const Color(0xFF1976D2).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
                       Icons.arrow_forward_rounded,
-                      color: AppDesignSystem.primaryGreen,
+                      color: Color(0xFF1976D2),
                       size: 20,
                     ),
                   ),
@@ -287,9 +306,7 @@ class _MistakesPageState extends State<MistakesPage> {
         SizedBox(height: 200),
         Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(
-              AppDesignSystem.primaryGreen,
-            ),
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1976D2)),
           ),
         ),
       ],
@@ -299,7 +316,7 @@ class _MistakesPageState extends State<MistakesPage> {
   Widget _buildEmptyState() {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(AppDesignSystem.spacing32),
+      padding: const EdgeInsets.all(32),
       children: [
         const SizedBox(height: 100),
         Center(
@@ -307,37 +324,47 @@ class _MistakesPageState extends State<MistakesPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(AppDesignSystem.spacing32),
+                padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: AppDesignSystem.successGreen.withOpacity(0.1),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF1E88E5), Color(0xFF42A5F5)],
+                  ),
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF1976D2).withOpacity(0.3),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.check_circle_outline_rounded,
                   size: 80,
-                  color: AppDesignSystem.successGreen,
+                  color: Colors.white,
                 ),
               ),
-              const SizedBox(height: AppDesignSystem.spacing24),
-              Text(
+              const SizedBox(height: 24),
+              const Text(
                 'No Mistakes Yet!',
-                style: AppDesignSystem.headlineLarge.copyWith(
-                  color: AppDesignSystem.successGreen,
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1976D2),
                 ),
               ),
-              const SizedBox(height: AppDesignSystem.spacing12),
+              const SizedBox(height: 12),
               Text(
                 'Keep up the great work!\nYou haven\'t made any mistakes.',
                 textAlign: TextAlign.center,
-                style: AppDesignSystem.bodyLarge.copyWith(
-                  color: AppDesignSystem.textSecondary,
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
               ),
-              const SizedBox(height: AppDesignSystem.spacing16),
+              const SizedBox(height: 16),
               Text(
                 'Pull down to refresh',
-                style: AppDesignSystem.bodyMedium.copyWith(
-                  color: AppDesignSystem.textTertiary,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[400],
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -351,7 +378,7 @@ class _MistakesPageState extends State<MistakesPage> {
   Widget _buildErrorState() {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(AppDesignSystem.spacing32),
+      padding: const EdgeInsets.all(32),
       children: [
         const SizedBox(height: 100),
         Center(
@@ -359,52 +386,48 @@ class _MistakesPageState extends State<MistakesPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(AppDesignSystem.spacing32),
+                padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: AppDesignSystem.errorRed.withOpacity(0.1),
+                  color: Colors.red.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.error_outline_rounded,
                   size: 80,
-                  color: AppDesignSystem.errorRed,
+                  color: Colors.red[400],
                 ),
               ),
-              const SizedBox(height: AppDesignSystem.spacing24),
+              const SizedBox(height: 24),
               Text(
                 'Failed to Load',
-                style: AppDesignSystem.headlineLarge.copyWith(
-                  color: AppDesignSystem.errorRed,
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red[400],
                 ),
               ),
-              const SizedBox(height: AppDesignSystem.spacing12),
+              const SizedBox(height: 12),
               Text(
                 'Unable to load your mistakes.\nPull down to refresh or tap retry.',
                 textAlign: TextAlign.center,
-                style: AppDesignSystem.bodyLarge.copyWith(
-                  color: AppDesignSystem.textSecondary,
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
               ),
-              const SizedBox(height: AppDesignSystem.spacing24),
+              const SizedBox(height: 24),
               SizedBox(
                 height: 48,
                 child: ElevatedButton.icon(
                   onPressed: () => _bloc.getMistakes(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppDesignSystem.primaryGreen,
+                    backgroundColor: const Color(0xFF1976D2),
+                    foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppDesignSystem.radiusMedium,
-                      ),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-                  label: Text(
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text(
                     'Retry',
-                    style: AppDesignSystem.titleMedium.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
               ),

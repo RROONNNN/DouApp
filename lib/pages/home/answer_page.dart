@@ -3,7 +3,9 @@ import 'package:duo_app/common/enums/request_status.dart';
 import 'package:duo_app/common/resources/app_design_system.dart';
 import 'package:duo_app/di/injection.dart';
 import 'package:duo_app/entities/question.dart';
+import 'package:duo_app/entities/user.dart';
 import 'package:duo_app/pages/bloc/app_bloc.dart';
+import 'package:duo_app/pages/bloc/app_state.dart';
 import 'package:duo_app/pages/home/cubit/answer_cubit.dart';
 import 'package:duo_app/pages/home/elements/gap_filling_page.dart';
 import 'package:duo_app/pages/home/elements/matching_page.dart';
@@ -60,6 +62,7 @@ class _AnswerPageState extends State<AnswerPage> {
         widget.isMistake,
         widget.questions,
       );
+
     _audioPlayer = AudioPlayer();
   }
 
@@ -162,7 +165,7 @@ class _AnswerPageState extends State<AnswerPage> {
                 child: const Center(
                   child: CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      AppDesignSystem.primaryGreen,
+                      Color(0xFF1976D2),
                     ),
                   ),
                 ),
@@ -239,9 +242,7 @@ class _AnswerPageState extends State<AnswerPage> {
               value: state.answeredCorrectly / state.totalQuestions,
               minHeight: 8,
               backgroundColor: AppDesignSystem.surfaceLight,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                AppDesignSystem.primaryGreen,
-              ),
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1976D2)),
             ),
           ),
         ],
@@ -264,6 +265,7 @@ class _AnswerPageState extends State<AnswerPage> {
         key: Key(question.id),
         question: question,
         onComplete: () => _handleCorrectAnswer(question.id),
+        onWrong: () => _handleWrongAnswer(question.id),
       );
     } else if (question.typeQuestion == TypeQuestion.matching) {
       return MatchingPage(
@@ -314,13 +316,13 @@ class _AnswerPageState extends State<AnswerPage> {
                             AppDesignSystem.spacing40,
                           ),
                           decoration: BoxDecoration(
-                            gradient: AppDesignSystem.successGradient,
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF1E88E5), Color(0xFF42A5F5)],
+                            ),
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: AppDesignSystem.primaryGreen.withOpacity(
-                                  0.3,
-                                ),
+                                color: const Color(0xFF1976D2).withOpacity(0.3),
                                 blurRadius: 24,
                                 spreadRadius: 8,
                               ),
@@ -341,7 +343,7 @@ class _AnswerPageState extends State<AnswerPage> {
                   Text(
                     'Congratulations!',
                     style: AppDesignSystem.displayMedium.copyWith(
-                      color: AppDesignSystem.primaryGreen,
+                      color: const Color(0xFF1976D2),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -370,7 +372,7 @@ class _AnswerPageState extends State<AnswerPage> {
                               Icons.check_circle_rounded,
                               '${state.totalQuestions}',
                               'Questions',
-                              AppDesignSystem.primaryGreen,
+                              const Color(0xFF1976D2),
                             ),
                           ],
                         ),
@@ -388,7 +390,9 @@ class _AnswerPageState extends State<AnswerPage> {
                         height: 56,
                         child: Container(
                           decoration: BoxDecoration(
-                            gradient: AppDesignSystem.greenGradient,
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
+                            ),
                             borderRadius: BorderRadius.circular(
                               AppDesignSystem.radiusMedium,
                             ),
@@ -425,7 +429,7 @@ class _AnswerPageState extends State<AnswerPage> {
                           ),
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(
-                              color: AppDesignSystem.primaryGreen,
+                              color: Color(0xFF1976D2),
                               width: 2,
                             ),
                             shape: RoundedRectangleBorder(
@@ -437,7 +441,7 @@ class _AnswerPageState extends State<AnswerPage> {
                           child: Text(
                             'Retry Quiz',
                             style: AppDesignSystem.titleLarge.copyWith(
-                              color: AppDesignSystem.primaryGreen,
+                              color: const Color(0xFF1976D2),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -669,7 +673,9 @@ class _AnimatedAnswerButtonState extends State<_AnimatedAnswerButton>
                   child: Container(
                     decoration: AppDesignSystem.cardDecoration(
                       gradient: _isPressed
-                          ? AppDesignSystem.blueGradient
+                          ? const LinearGradient(
+                              colors: [Color(0xFF1E88E5), Color(0xFF42A5F5)],
+                            )
                           : null,
                       color: _isPressed ? null : AppDesignSystem.surfaceWhite,
                       shadows: _isPressed

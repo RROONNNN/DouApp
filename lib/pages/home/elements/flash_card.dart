@@ -123,12 +123,29 @@ class AnimatedCard extends StatelessWidget {
         height: height,
         width: width,
         child: Card(
-          elevation: 4,
+          elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
+            side: BorderSide(
+              color: const Color(0xFF1976D2).withOpacity(0.3),
+              width: 2,
+            ),
           ),
           borderOnForeground: false,
-          child: Padding(padding: const EdgeInsets.all(10), child: child),
+          shadowColor: const Color(0xFF1976D2).withOpacity(0.3),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF1976D2).withOpacity(0.2),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Padding(padding: const EdgeInsets.all(10), child: child),
+          ),
         ),
       ),
     );
