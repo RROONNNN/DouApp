@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:math';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:duo_app/common/enums/request_status.dart';
@@ -40,6 +41,8 @@ class AnswerCubit extends Cubit<AnswerState> {
 
       if (isMistake) {
         this.initQuestions = initQuestions;
+
+        shuffleAnswersAndQuestions(initQuestions);
         _questions = Queue.from(initQuestions);
         emit(
           state.copyWith(
@@ -69,19 +72,15 @@ class AnswerCubit extends Cubit<AnswerState> {
       }
 
       final questions = await learningService.getQuestions(lessonId);
-      // for test : filter all questions to only have ordering questions
-      // final orderingQuestions = questions
-      //     .where(
-      //       (question) => question.typeQuestion == TypeQuestion.multipleChoice,
-      //     )
-      //     .toList();
+
+      shuffleAnswersAndQuestions(questions);
       _questions = Queue.from(questions);
       emit(
         state.copyWith(
           status: RequestStatus.success,
           questions: questions,
           totalQuestions: questions.length,
-          currentQuestion: _questions.first,
+          currentQuestion: questions.first,
         ),
       );
     } catch (e) {
@@ -91,6 +90,21 @@ class AnswerCubit extends Cubit<AnswerState> {
           errorMessage: e.toString(),
         ),
       );
+    }
+  }
+
+  void shuffleAnswersAndQuestions(List<Question> questions) {
+    Random random = Random();
+    questions.shuffle(random);
+    for (var question in questions) {
+      if (question.typeQuestion == TypeQuestion.multipleChoice) {
+        question.answers?.shuffle(random);
+      } else if (question.typeQuestion == TypeQuestion.ordering) {
+        question.fragmentText?.shuffle(random);
+      } else if (question.typeQuestion == TypeQuestion.matching) {
+        question.leftText?.shuffle(random);
+        question.rightText?.shuffle(random);
+      }
     }
   }
 
@@ -134,7 +148,15 @@ class AnswerCubit extends Cubit<AnswerState> {
     );
   }
 
-  Future<void> answerIncorrectly(String questionId) async {
+  void nextQuestionOnIncorrectly() {
+    _questions.removeFirst();
+    emit(state.copyWith(currentQuestion: _questions.first));
+  }
+
+  Future<void> answerIncorrectly(
+    String questionId, {
+    bool isShouldDelay = false,
+  }) async {
     if (!isMistake) {
       heartCount -= 1;
       learningService.addMistake([questionId]);
@@ -155,7 +177,7 @@ class AnswerCubit extends Cubit<AnswerState> {
     final question = _questions.firstWhere(
       (question) => question.id == questionId,
     );
-    _questions.removeFirst();
+    if (!isShouldDelay) _questions.removeFirst();
     _questions.add(question);
     emit(state.copyWith(currentQuestion: _questions.first));
   }

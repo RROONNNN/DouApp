@@ -6,6 +6,7 @@ class Course {
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool isLocked;
 
   const Course({
     required this.id,
@@ -15,6 +16,7 @@ class Course {
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
+    required this.isLocked,
   });
 
   factory Course.fromJson(Map<String, dynamic> json) {
@@ -39,6 +41,7 @@ class Course {
       isActive: (json['isActive'] as bool?) ?? false,
       createdAt: parseDate(json['createdAt']),
       updatedAt: parseDate(json['updatedAt']),
+      isLocked: (json['isLocked'] as bool?) ?? false,
     );
   }
 
@@ -50,6 +53,7 @@ class Course {
     'isActive': isActive,
     'createdAt': createdAt.toIso8601String(),
     'updatedAt': updatedAt.toIso8601String(),
+    'isLocked': isLocked,
   };
 
   Course copyWith({
@@ -69,6 +73,7 @@ class Course {
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      isLocked: isLocked ?? this.isLocked,
     );
   }
 

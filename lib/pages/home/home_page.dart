@@ -114,8 +114,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               child: Column(
                                 children: [
                                   UnitTile(
-                                    title: state.units[index].title,
-                                    description: state.units[index].description,
+                                    title: state.units[index].title ?? '',
+                                    description:
+                                        state.units[index].description ?? '',
                                     unitNumber: state.units[index].displayOrder
                                         .toString(),
                                     backgroundColor: const Color(0xFF1976D2),
@@ -194,86 +195,99 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return FadeTransition(
-      opacity: _headerFadeAnimation,
-      child: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF1E88E5), // Blue 600
-              Color(0xFF42A5F5), // Blue 400
-            ],
-          ),
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(24),
-            bottomRight: Radius.circular(24),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Color(0x331976D2),
-              blurRadius: 12,
-              offset: Offset(0, 4),
+    return BlocBuilder<HomeCubit, HomeState>(
+      builder: (context, state) {
+        final selectedCourse = state.selectedCourse;
+        final courseName = selectedCourse?.description ?? 'Learning Path';
+        final unitsCount = state.units.length;
+        final subtitle = selectedCourse != null
+            ? '$unitsCount ${unitsCount == 1 ? 'Unit' : 'Units'} available'
+            : 'Continue your journey';
+
+        return FadeTransition(
+          opacity: _headerFadeAnimation,
+          child: Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF1E88E5), // Blue 600
+                  Color(0xFF42A5F5), // Blue 400
+                ],
+              ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(24),
+                bottomRight: Radius.circular(24),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0x331976D2),
+                  blurRadius: 12,
+                  offset: Offset(0, 4),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Learning Path',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Continue your journey',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.menu_book,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BlocProvider.value(
-                          value: homeCubit,
-                          child: const ChooseCourse(),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          courseName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.menu_book,
+                        color: Colors.white,
+                        size: 28,
                       ),
-                    );
-                  },
-                ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BlocProvider.value(
+                              value: homeCubit,
+                              child: const ChooseCourse(),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

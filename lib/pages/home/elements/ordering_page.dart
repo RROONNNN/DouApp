@@ -139,12 +139,13 @@ class _OrderingPageState extends State<OrderingPage> {
         .join(' ');
 
     // Compare with correct answer
-    final correctAnswer = widget.question.correctAnswer ?? '';
+    final exactFragmentText = widget.question.exactFragmentText ?? '';
 
     setState(() {
       _hasSubmitted = true;
       _isCorrect =
-          userAnswer.trim().toLowerCase() == correctAnswer.trim().toLowerCase();
+          userAnswer.trim().toLowerCase() ==
+          exactFragmentText.trim().toLowerCase();
     });
 
     // Call appropriate callback after a short delay

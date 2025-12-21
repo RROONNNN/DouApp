@@ -1,4 +1,5 @@
 import 'package:duo_app/common/enums/request_status.dart';
+import 'package:duo_app/common/utils/widgets/loading_page.dart';
 import 'package:duo_app/di/injection.dart';
 import 'package:duo_app/entities/question.dart';
 import 'package:duo_app/entities/unit.dart';
@@ -247,7 +248,7 @@ class _MistakesPageState extends State<MistakesPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          unit.title,
+                          unit.title ?? '',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -300,17 +301,7 @@ class _MistakesPageState extends State<MistakesPage> {
   }
 
   Widget _buildLoadingState() {
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      children: const [
-        SizedBox(height: 200),
-        Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1976D2)),
-          ),
-        ),
-      ],
-    );
+    return const LoadingPage();
   }
 
   Widget _buildEmptyState() {

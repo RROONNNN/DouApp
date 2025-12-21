@@ -156,12 +156,12 @@ class LearningService {
   }) async {
     try {
       final response = await _apiClient.get(
-        path: ApiEndpoint.getCourses,
+        path: ApiEndpoint.getProcessCourses,
         queryParameters: {'pageSize': pageSize, 'pageNumber': pageNumber},
       );
       if (response.isSuccess()) {
         final value = response.value as Map<String, dynamic>;
-        final coursesJson = value['data'] as List<dynamic>? ?? [];
+        final coursesJson = value['data']['result'] as List<dynamic>? ?? [];
         return coursesJson.map((json) => Course.fromJson(json)).toList();
       }
       log('getCourses fail : ${response.error}');
@@ -171,6 +171,28 @@ class LearningService {
       rethrow;
     }
   }
+
+  // Future<List<Course>> getProcessCourses({
+  //   int pageSize = 10,
+  //   int pageNumber = 1,
+  // }) async {
+  //   try {
+  //     final response = await _apiClient.get(
+  //       path: ApiEndpoint.getProcessCourses,
+  //       queryParameters: {'pageSize': pageSize, 'pageNumber': pageNumber},
+  //     );
+  //     if (response.isSuccess()) {
+  //       final value = response.value as Map<String, dynamic>;
+  //       final coursesJson = value['data'] as List<dynamic>? ?? [];
+  //       return coursesJson.map((json) => Course.fromJson(json)).toList();
+  //     }
+  //     log('getCourses fail : ${response.error}');
+  //     return [];
+  //   } catch (e) {
+  //     log('Error getCourses : $e');
+  //     rethrow;
+  //   }
+  // }
 
   Future<List<Unit>> getUnitsByCourseId(
     String courseId, {

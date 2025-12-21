@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:duo_app/common/enums/request_status.dart';
 import 'package:duo_app/common/resources/app_design_system.dart';
+import 'package:duo_app/common/utils/widgets/loading_page.dart';
 import 'package:duo_app/di/injection.dart';
 import 'package:duo_app/entities/question.dart';
 import 'package:duo_app/entities/user.dart';
@@ -91,9 +92,13 @@ class _AnswerPageState extends State<AnswerPage> {
     _answerCubit.answerCorrectly(questionId);
   }
 
-  void _handleWrongAnswer(String questionId) {
+  void _handleWrongAnswer(String questionId, {bool isShouldDelay = false}) {
     _playSound(false);
-    _answerCubit.answerIncorrectly(questionId);
+    _answerCubit.answerIncorrectly(questionId, isShouldDelay: isShouldDelay);
+  }
+
+  void _handleNextQuestionOnIncorrectly() {
+    _answerCubit.nextQuestionOnIncorrectly();
   }
 
   @override
@@ -278,6 +283,8 @@ class _AnswerPageState extends State<AnswerPage> {
         key: Key(question.id),
         question: question,
         onComplete: () => _handleCorrectAnswer(question.id),
+        onWrong: () => _handleWrongAnswer(question.id, isShouldDelay: true),
+        onNext: () => _handleNextQuestionOnIncorrectly(),
       );
     }
     return const Center(child: Text('Question type not supported'));
@@ -535,13 +542,7 @@ class MultipleChoicePage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppDesignSystem.primaryGreen,
-                      ),
-                    ),
-                  ),
+                  child: const LoadingPage(),
                 ),
                 errorWidget: (context, url, error) => Container(
                   height: 240,

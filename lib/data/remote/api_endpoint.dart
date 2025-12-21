@@ -21,4 +21,5 @@ class ApiEndpoint {
   static const String getMistakes = '/api/mistakes';
   static const String addMistake = '/api/mistakes';
   static const String patchMistake = '/api/mistakes';
+  static const String getProcessCourses = '/api/progress/courses';
 }

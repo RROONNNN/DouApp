@@ -3,10 +3,10 @@ import 'package:duo_app/entities/lesson.dart';
 class Unit {
   final String id;
   final String courseId;
-  final String title;
-  final String description;
+  final String? title;
+  final String? description;
   final int displayOrder;
-  final String thumbnail;
+  final String? thumbnail;
   final DateTime updatedAt;
   final DateTime createdAt;
   final List<Lesson> lessons;
@@ -27,10 +27,10 @@ class Unit {
     return Unit(
       id: json['_id'] as String,
       courseId: json['courseId'] as String,
-      title: json['title'] as String,
-      description: json['description'] as String,
+      title: json['title'] as String?,
+      description: json['description'] as String?,
       displayOrder: json['displayOrder'] as int,
-      thumbnail: json['thumbnail'] as String,
+      thumbnail: json['thumbnail'] as String?,
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       createdAt: DateTime.parse(json['createdAt'] as String),
       lessons: (json['lessons'] as List<dynamic>? ?? [])

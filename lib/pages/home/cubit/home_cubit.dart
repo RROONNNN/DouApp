@@ -73,6 +73,9 @@ class HomeCubit extends Cubit<HomeState> {
       if (isClosed) return;
       emit(state.copyWith(status: RequestStatus.requesting));
       final course = await learningService.getCourseById(courseId);
+      if (course.isLocked) {
+        return;
+      }
       final units = await learningService.getUnitsByCourseId(courseId);
       if (isClosed) return;
       emit(

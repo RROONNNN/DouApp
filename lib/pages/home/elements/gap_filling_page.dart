@@ -6,11 +6,15 @@ import 'package:flutter/material.dart';
 class GapFillingPage extends StatefulWidget {
   final Question question;
   final VoidCallback onComplete;
+  final VoidCallback onWrong;
+  final VoidCallback onNext;
 
   const GapFillingPage({
     super.key,
     required this.question,
     required this.onComplete,
+    required this.onWrong,
+    required this.onNext,
   });
 
   @override
@@ -117,6 +121,11 @@ class _GapFillingPageState extends State<GapFillingPage>
           widget.question.correctAnswer?.toLowerCase();
     });
 
+    if (_isCorrect) {
+      widget.onComplete();
+    } else {
+      widget.onWrong();
+    }
     _feedbackController.forward(from: 0);
   }
 
@@ -471,7 +480,7 @@ class _GapFillingPageState extends State<GapFillingPage>
 
   Widget _buildBottomActions() {
     // Show Continue button after submission
-    if (_hasSubmitted) {
+    if (_hasSubmitted && !_isCorrect) {
       return Padding(
         padding: const EdgeInsets.all(AppDesignSystem.spacing20),
         child: TweenAnimationBuilder<double>(
@@ -495,7 +504,7 @@ class _GapFillingPageState extends State<GapFillingPage>
                     boxShadow: AppDesignSystem.shadowHigh,
                   ),
                   child: ElevatedButton(
-                    onPressed: widget.onComplete,
+                    onPressed: widget.onNext,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       shadowColor: Colors.transparent,
