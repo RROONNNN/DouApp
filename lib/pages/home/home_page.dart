@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:duo_app/data/remote/learning_service.dart';
 import 'package:duo_app/di/injection.dart';
 import 'package:duo_app/pages/bloc/app_bloc.dart';
 import 'package:duo_app/pages/home/answer_page.dart';
@@ -119,6 +118,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         state.units[index].description ?? '',
                                     unitNumber: state.units[index].displayOrder
                                         .toString(),
+                                    thumbnail: state.units[index].thumbnail,
                                     backgroundColor: const Color(0xFF1976D2),
                                     unitId: state.units[index].id,
                                   ),

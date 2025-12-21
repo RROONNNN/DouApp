@@ -519,54 +519,57 @@ class MultipleChoicePage extends StatelessWidget {
       child: Column(
         children: [
           // Image Section with modern styling
-          Container(
-            margin: const EdgeInsets.all(AppDesignSystem.spacing16),
-            decoration: AppDesignSystem.cardDecoration(
-              shadows: AppDesignSystem.shadowHigh,
-              borderRadius: AppDesignSystem.radiusLarge,
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(AppDesignSystem.radiusLarge),
-              child: CachedNetworkImage(
-                height: 240,
-                width: double.infinity,
-                fit: BoxFit.contain,
-                imageUrl: question.mediaUrl ?? '',
-                placeholder: (context, url) => Container(
-                  height: 240,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppDesignSystem.surfaceGrey,
-                        AppDesignSystem.surfaceLight,
-                      ],
-                    ),
-                  ),
-                  child: const LoadingPage(),
+          if (question.mediaUrl != null && question.mediaUrl!.isNotEmpty)
+            Container(
+              margin: const EdgeInsets.all(AppDesignSystem.spacing16),
+              decoration: AppDesignSystem.cardDecoration(
+                shadows: AppDesignSystem.shadowHigh,
+                borderRadius: AppDesignSystem.radiusLarge,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(
+                  AppDesignSystem.radiusLarge,
                 ),
-                errorWidget: (context, url, error) => Container(
+                child: CachedNetworkImage(
                   height: 240,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppDesignSystem.surfaceGrey,
-                        AppDesignSystem.surfaceLight,
-                      ],
+                  width: double.infinity,
+                  fit: BoxFit.contain,
+                  imageUrl: question.mediaUrl!,
+                  placeholder: (context, url) => Container(
+                    height: 240,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppDesignSystem.surfaceGrey,
+                          AppDesignSystem.surfaceLight,
+                        ],
+                      ),
                     ),
+                    child: const LoadingPage(),
                   ),
-                  child: const Icon(
-                    Icons.image_not_supported_rounded,
-                    size: 64,
-                    color: AppDesignSystem.textTertiary,
+                  errorWidget: (context, url, error) => Container(
+                    height: 240,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppDesignSystem.surfaceGrey,
+                          AppDesignSystem.surfaceLight,
+                        ],
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.image_not_supported_rounded,
+                      size: 64,
+                      color: AppDesignSystem.textTertiary,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
 
           // Question prompt
           Padding(
@@ -575,9 +578,10 @@ class MultipleChoicePage extends StatelessWidget {
               vertical: AppDesignSystem.spacing16,
             ),
             child: Text(
-              'Choose the correct answer',
+              question.title ?? 'Choose the correct answer',
               style: AppDesignSystem.titleLarge.copyWith(
-                color: AppDesignSystem.textSecondary,
+                color: AppDesignSystem.textPrimary,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),

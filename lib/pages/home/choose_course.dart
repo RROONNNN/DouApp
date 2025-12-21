@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:duo_app/common/enums/request_status.dart';
 import 'package:duo_app/common/utils/widgets/loading_page.dart';
 import 'package:duo_app/pages/home/cubit/home_cubit.dart';
@@ -224,21 +225,96 @@ class _ChooseCourseState extends State<ChooseCourse> {
                                     child: Row(
                                       children: [
                                         Container(
-                                          padding: const EdgeInsets.all(16),
+                                          width: 80,
+                                          height: 80,
                                           decoration: BoxDecoration(
                                             color: Colors.white.withOpacity(
-                                              0.25,
+                                              0.2,
                                             ),
                                             borderRadius: BorderRadius.circular(
                                               12,
                                             ),
                                           ),
-                                          child: Icon(
-                                            isLocked
-                                                ? Icons.lock_outline
-                                                : Icons.book_outlined,
-                                            color: Colors.white,
-                                            size: 32,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            child: course.thumbnail.isNotEmpty
+                                                ? Stack(
+                                                    children: [
+                                                      CachedNetworkImage(
+                                                        imageUrl:
+                                                            course.thumbnail,
+                                                        width: 80,
+                                                        height: 80,
+                                                        fit: BoxFit.cover,
+                                                        placeholder:
+                                                            (
+                                                              context,
+                                                              url,
+                                                            ) => Container(
+                                                              color: Colors
+                                                                  .white
+                                                                  .withOpacity(
+                                                                    0.1,
+                                                                  ),
+                                                              child: const Center(
+                                                                child: CircularProgressIndicator(
+                                                                  strokeWidth:
+                                                                      2,
+                                                                  valueColor:
+                                                                      AlwaysStoppedAnimation<
+                                                                        Color
+                                                                      >(
+                                                                        Colors
+                                                                            .white,
+                                                                      ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                        errorWidget:
+                                                            (
+                                                              context,
+                                                              url,
+                                                              error,
+                                                            ) => Center(
+                                                              child: Icon(
+                                                                isLocked
+                                                                    ? Icons
+                                                                          .lock_outline
+                                                                    : Icons
+                                                                          .book_outlined,
+                                                                color: Colors
+                                                                    .white,
+                                                                size: 32,
+                                                              ),
+                                                            ),
+                                                      ),
+                                                      if (isLocked)
+                                                        Container(
+                                                          color: Colors.black
+                                                              .withOpacity(0.5),
+                                                          child: const Center(
+                                                            child: Icon(
+                                                              Icons
+                                                                  .lock_outline,
+                                                              color:
+                                                                  Colors.white,
+                                                              size: 32,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  )
+                                                : Center(
+                                                    child: Icon(
+                                                      isLocked
+                                                          ? Icons.lock_outline
+                                                          : Icons.book_outlined,
+                                                      color: Colors.white,
+                                                      size: 32,
+                                                    ),
+                                                  ),
                                           ),
                                         ),
                                         const SizedBox(width: 16),

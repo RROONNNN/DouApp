@@ -1,4 +1,4 @@
-import 'package:duo_app/entities/theory.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:duo_app/route/app_route.dart';
 import 'package:duo_app/route/navigator.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +8,7 @@ class UnitTile extends StatefulWidget {
   final String title;
   final String description;
   final String? unitNumber;
+  final String? thumbnail;
   final Color? backgroundColor;
 
   const UnitTile({
@@ -16,6 +17,7 @@ class UnitTile extends StatefulWidget {
     required this.title,
     required this.description,
     this.unitNumber,
+    this.thumbnail,
     this.backgroundColor,
   });
 
@@ -27,7 +29,6 @@ class _UnitTileState extends State<UnitTile>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
-  bool _isPressed = false;
 
   @override
   void initState() {
@@ -80,15 +81,12 @@ class _UnitTileState extends State<UnitTile>
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
             onTapDown: (_) {
-              setState(() => _isPressed = true);
               _controller.forward();
             },
             onTapUp: (_) {
-              setState(() => _isPressed = false);
               _controller.reverse();
             },
             onTapCancel: () {
-              setState(() => _isPressed = false);
               _controller.reverse();
             },
             onTap: () {
@@ -151,7 +149,7 @@ class _UnitTileState extends State<UnitTile>
                     ),
                   ),
                   const SizedBox(width: 16),
-                  // Right side - Icon button with animation
+                  // Right side - Thumbnail with theory button overlay
                   TweenAnimationBuilder<double>(
                     tween: Tween(begin: 0.0, end: 1.0),
                     duration: const Duration(milliseconds: 400),
@@ -160,28 +158,97 @@ class _UnitTileState extends State<UnitTile>
                       return Transform.scale(scale: value, child: child);
                     },
                     child: Container(
-                      width: 56,
-                      height: 56,
+                      width: 80,
+                      height: 80,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.25),
+                        color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: Colors.white.withOpacity(0.3),
                           width: 2,
                         ),
                       ),
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.note_alt_outlined,
-                          color: Colors.white,
-                          size: 28,
-                        ),
-                        onPressed: () {
-                          AppNavigator.pushNamed(
-                            RouterName.theory,
-                            arguments: {'unitId': widget.unitId},
-                          );
-                        },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child:
+                            widget.thumbnail != null &&
+                                widget.thumbnail!.isNotEmpty
+                            ? Stack(
+                                children: [
+                                  CachedNetworkImage(
+                                    imageUrl: widget.thumbnail!,
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => Container(
+                                      color: Colors.white.withOpacity(0.1),
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
+                                        ),
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        const Center(
+                                          child: Icon(
+                                            Icons.image_not_supported_rounded,
+                                            color: Colors.white,
+                                            size: 32,
+                                          ),
+                                        ),
+                                  ),
+                                  // Theory button overlay
+                                  Positioned(
+                                    bottom: 4,
+                                    right: 4,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.6),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: IconButton(
+                                        padding: const EdgeInsets.all(4),
+                                        constraints: const BoxConstraints(
+                                          minWidth: 32,
+                                          minHeight: 32,
+                                        ),
+                                        icon: const Icon(
+                                          Icons.note_alt_outlined,
+                                          color: Colors.white,
+                                          size: 18,
+                                        ),
+                                        onPressed: () {
+                                          AppNavigator.pushNamed(
+                                            RouterName.theory,
+                                            arguments: {
+                                              'unitId': widget.unitId,
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Center(
+                                child: IconButton(
+                                  icon: const Icon(
+                                    Icons.note_alt_outlined,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
+                                  onPressed: () {
+                                    AppNavigator.pushNamed(
+                                      RouterName.theory,
+                                      arguments: {'unitId': widget.unitId},
+                                    );
+                                  },
+                                ),
+                              ),
                       ),
                     ),
                   ),

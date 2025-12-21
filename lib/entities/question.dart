@@ -57,6 +57,7 @@ class Question {
   final List<String>? fragmentText;
   final String? mediaUrl;
   final int displayOrder;
+  final String? title;
   final TypeQuestion typeQuestion;
   final DateTime updatedAt;
   final DateTime createdAt;
@@ -69,6 +70,7 @@ class Question {
     this.correctAnswer,
     this.answers,
     this.mediaUrl,
+    this.title,
     required this.displayOrder,
     required this.typeQuestion,
     required this.updatedAt,
@@ -84,6 +86,7 @@ class Question {
       id: json['_id'] as String,
       lessonId: json['lessonId'] as String,
       correctAnswer: json['correctAnswer'] as String?,
+      title: json['title'] as String?,
       answers: (json['answers'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
@@ -113,6 +116,7 @@ class Question {
       'lessonId': lessonId,
       'correctAnswer': correctAnswer,
       'answers': answers,
+      'title': title,
       'mediaUrl': mediaUrl,
       'displayOrder': displayOrder,
       'typeQuestion': typeQuestion.toShortString(),

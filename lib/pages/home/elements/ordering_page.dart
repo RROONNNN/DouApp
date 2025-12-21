@@ -442,7 +442,7 @@ class _OrderingPageState extends State<OrderingPage> {
                                     height: AppDesignSystem.spacing4,
                                   ),
                                   Text(
-                                    'Correct answer: ${widget.question.correctAnswer}',
+                                    'Correct answer: ${widget.question.exactFragmentText}',
                                     style: AppDesignSystem.bodyMedium.copyWith(
                                       color: AppDesignSystem.errorRed,
                                       fontWeight: FontWeight.w500,
