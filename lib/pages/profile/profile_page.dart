@@ -1,7 +1,7 @@
 import 'package:duo_app/entities/user.dart';
 import 'package:duo_app/pages/bloc/app_bloc.dart';
 import 'package:duo_app/pages/bloc/app_state.dart';
-import 'package:duo_app/pages/profile/cubit/profile_cubit.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -609,7 +609,7 @@ class _ProfilePageState extends State<ProfilePage>
           ElevatedButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              context.read<ProfileCubit>().logOut();
+              context.read<AppBloc>().logOut();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,

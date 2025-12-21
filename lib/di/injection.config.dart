@@ -28,7 +28,6 @@ import 'package:duo_app/pages/login/cubit/forgot_password_cubit.dart' as _i940;
 import 'package:duo_app/pages/login/cubit/register_cubit.dart' as _i1065;
 import 'package:duo_app/pages/login/cubit/verify_code_cubit.dart' as _i131;
 import 'package:duo_app/pages/mistakes/cubit/mistake_cubit.dart' as _i63;
-import 'package:duo_app/pages/profile/cubit/profile_cubit.dart' as _i900;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
@@ -107,9 +106,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.singleton<_i230.AppBloc>(
       () => _i230.AppBloc(gh<_i432.AuthenticationService>()),
-    );
-    gh.factory<_i900.ProfileCubit>(
-      () => _i900.ProfileCubit(gh<_i432.AuthenticationService>()),
     );
     return this;
   }

@@ -1,7 +1,7 @@
 import 'dart:developer';
 
+import 'package:duo_app/common/event/event_bus_event.dart';
 import 'package:duo_app/data/remote/authentication_service.dart';
-import 'package:duo_app/pages/profile/cubit/profile_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import '../../common/event/event_bus_mixin.dart';
@@ -24,6 +24,15 @@ class AppBloc extends Cubit<AppState> with EventBusMixin {
       }
     } catch (e) {
       emit(state.copyWith(status: ProfileStatus.failure));
+    }
+  }
+
+  void logOut() async {
+    try {
+      await authenticationService.logout();
+      EventBusMixin.shareStaticEvent(LogoutEvent());
+    } catch (e) {
+      log('ProfileCubit error: ${e.toString()}');
     }
   }
 }

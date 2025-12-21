@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 class MatchingPage extends StatefulWidget {
   final Question question;
   final VoidCallback onComplete;
+  final Function(String) onWrongAnswer;
   const MatchingPage({
     super.key,
     required this.question,
     required this.onComplete,
+    required this.onWrongAnswer,
   });
 
   @override
@@ -126,6 +128,7 @@ class _MatchingPageState extends State<MatchingPage>
     } else {
       // FAILURE - Wrong match
       setState(() {
+        widget.onWrongAnswer(widget.question.id);
         _itemStates[leftId] = _ItemState.error;
         _itemStates[rightId] = _ItemState.error;
       });

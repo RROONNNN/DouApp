@@ -277,6 +277,8 @@ class _AnswerPageState extends State<AnswerPage> {
         key: Key(question.id),
         question: question,
         onComplete: () => _handleCorrectAnswer(question.id),
+        onWrongAnswer: (questionId) =>
+            _answerCubit.decreaseHeartCount(questionId),
       );
     } else if (question.typeQuestion == TypeQuestion.gap) {
       return GapFillingPage(

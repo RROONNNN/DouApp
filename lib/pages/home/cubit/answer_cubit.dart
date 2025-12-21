@@ -93,6 +93,24 @@ class AnswerCubit extends Cubit<AnswerState> {
     }
   }
 
+  Future<void> decreaseHeartCount(String questionId) async {
+    if (!isMistake) {
+      heartCount -= 1;
+      learningService.addMistake([questionId]);
+      await learningService.patchProgress(
+        lessonId: state.currentQuestion?.lessonId ?? '',
+        unitId: unitId,
+        courseId: courseId,
+        experiencePoint: 10,
+        heartCount: heartCount,
+      );
+      if (heartCount <= 0) {
+        emit(state.copyWith(isHeartCountReached: true));
+        return;
+      }
+    }
+  }
+
   void shuffleAnswersAndQuestions(List<Question> questions) {
     Random random = Random();
     questions.shuffle(random);
@@ -114,6 +132,11 @@ class AnswerCubit extends Cubit<AnswerState> {
 
   Future<void> answerCorrectly(String questionId) async {
     _questions.removeFirst();
+    if (isMistake) {
+      await learningService.patchMistakes([
+        {"unitId": unitId, "questionId": questionId},
+      ]);
+    }
     if (isQuizComplete()) {
       if (state.currentQuestion?.lessonId == null) {
         emit(
@@ -132,10 +155,6 @@ class AnswerCubit extends Cubit<AnswerState> {
           experiencePoint: 10,
           heartCount: heartCount,
         );
-      } else {
-        await learningService.patchMistakes([
-          {"unitId": unitId, "questionId": questionId},
-        ]);
       }
       emit(state.copyWith(isQuizComplete: true));
       return;
@@ -160,14 +179,14 @@ class AnswerCubit extends Cubit<AnswerState> {
     if (!isMistake) {
       heartCount -= 1;
       learningService.addMistake([questionId]);
+      await learningService.patchProgress(
+        lessonId: state.currentQuestion?.lessonId ?? '',
+        unitId: unitId,
+        courseId: courseId,
+        experiencePoint: 10,
+        heartCount: heartCount,
+      );
       if (heartCount <= 0) {
-        await learningService.patchProgress(
-          lessonId: state.currentQuestion?.lessonId ?? '',
-          unitId: unitId,
-          courseId: courseId,
-          experiencePoint: 10,
-          heartCount: 0,
-        );
         emit(state.copyWith(isHeartCountReached: true));
 
         return;
